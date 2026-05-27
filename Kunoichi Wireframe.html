@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Kunoichi — Wireframe</title>
+<meta name="viewport" content="width=1280" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Architects+Daughter&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1b1b1b;
+    --paper:#f5f1e8;
+    --paper-2:#ebe6d8;
+    --rule:#1b1b1b;
+    --muted:#7a7570;
+    --neon: oklch(0.78 0.18 330); /* cyberpunk magenta */
+    --neon-2: oklch(0.82 0.18 195); /* cyan */
+    --grid: rgba(27,27,27,0.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'Architects Daughter', 'Caveat', cursive;}
+  body{
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .mono{font-family:'JetBrains Mono', ui-monospace, monospace;}
+  .caveat{font-family:'Caveat', cursive;}
+
+  /* ------- wireframe primitives ------- */
+  .box{
+    border:2px solid var(--ink);
+    border-radius:4px;
+    background:var(--paper);
+    position:relative;
+  }
+  .box.dashed{ border-style:dashed; }
+  .box.thick{ border-width:3px; }
+  .box.inverse{ background:var(--ink); color:var(--paper); }
+  .label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .corner-tag{
+    position:absolute; top:-10px; left:10px;
+    background:var(--paper); padding:0 6px;
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    color:var(--muted); letter-spacing:0.1em; text-transform:uppercase;
+  }
+  .scribble{
+    background-image: repeating-linear-gradient(135deg, var(--ink) 0 1.5px, transparent 1.5px 7px);
+    opacity:0.85;
+  }
+  .placeholder-x{
+    position:relative; overflow:hidden;
+    background:
+      linear-gradient(45deg, transparent 49%, var(--ink) 49.5% 50.5%, transparent 51%),
+      linear-gradient(-45deg, transparent 49%, var(--ink) 49.5% 50.5%, transparent 51%);
+  }
+  .placeholder-x::after{
+    content: attr(data-note);
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    background:var(--paper); padding:4px 10px; border:1.5px solid var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--ink);
+    text-transform:uppercase; letter-spacing:0.1em; white-space:nowrap;
+  }
+  .play-bezel{
+    width:88px;height:88px;border-radius:999px;border:3px solid var(--ink);
+    display:grid;place-items:center; background:var(--paper);
+  }
+  .play-bezel::after{
+    content:""; width:0;height:0;
+    border-left:24px solid var(--ink);
+    border-top:16px solid transparent;
+    border-bottom:16px solid transparent;
+    margin-left:6px;
+  }
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    border:2.5px solid var(--ink); padding:14px 22px; border-radius:6px;
+    background:var(--paper); font-family:'Architects Daughter', cursive;
+    font-size:20px; line-height:1;
+  }
+  .btn.primary{ background:var(--ink); color:var(--paper); }
+  .btn.neon{ background:var(--neon); color:var(--ink); border-color:var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  .btn .glyph{font-family:'JetBrains Mono', monospace; font-size:14px;}
+  .ruled-line{
+    background-image: repeating-linear-gradient(90deg, var(--ink) 0 8px, transparent 8px 14px);
+    height:2px;
+  }
+
+  /* ------- page chrome ------- */
+  .stage{
+    max-width:1280px; margin:0 auto; padding:28px 28px 80px;
+  }
+  .stage-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    margin-bottom:24px; gap:24px;
+  }
+  .stage-head h1{
+    font-family:'Caveat', cursive; font-weight:700;
+    font-size:54px; margin:0; line-height:1;
+  }
+  .stage-head .sub{
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    color:var(--muted); letter-spacing:0.12em; text-transform:uppercase;
+  }
+  .annotation{
+    font-family:'Caveat', cursive; font-size:22px; color:var(--ink);
+    transform:rotate(-3deg); display:inline-block;
+  }
+  .arrow{
+    font-family:'Caveat', cursive; font-size:24px;
+  }
+  .tabbar{
+    display:flex; gap:0; border:2px solid var(--ink); border-radius:8px;
+    background:var(--paper); padding:4px; width:fit-content;
+  }
+  .tabbar button{
+    appearance:none; background:transparent; border:0; cursor:pointer;
+    font-family:'Architects Daughter', cursive; font-size:18px;
+    padding:8px 18px; border-radius:5px; color:var(--ink);
+  }
+  .tabbar button[aria-selected="true"]{ background:var(--ink); color:var(--paper); }
+
+  /* layout container per variant */
+  .layout{
+    background:var(--paper);
+    border:2.5px solid var(--ink);
+    border-radius:10px;
+    padding:0;
+    overflow:hidden;
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .layout-meta{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 18px;
+    background:var(--paper-2);
+    border-bottom:2px solid var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.08em; text-transform:uppercase; color:var(--ink);
+  }
+  .nav{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 28px; border-bottom:1.5px dashed var(--ink);
+  }
+  .nav .logo{
+    font-family:'Caveat', cursive; font-weight:700; font-size:28px; letter-spacing:0.02em;
+  }
+  .nav .links{display:flex; gap:24px; font-family:'JetBrains Mono', monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted);}
+  .nav .links span.active{color:var(--ink); text-decoration:underline; text-underline-offset:6px;}
+  .nav .util{display:flex; gap:10px; align-items:center;}
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    border:1.5px solid var(--ink); border-radius:999px;
+    padding:4px 10px; font-family:'JetBrains Mono', monospace; font-size:11px;
+    text-transform:uppercase; letter-spacing:0.1em;
+  }
+  .dot{width:8px;height:8px;border-radius:999px;background:var(--neon); display:inline-block;}
+
+  /* ---- HERO common ---- */
+  .hero{position:relative;}
+  .hero .video{
+    position:absolute; inset:0; background:var(--paper-2);
+    background-image:
+      repeating-linear-gradient(135deg, rgba(27,27,27,0.06) 0 2px, transparent 2px 14px),
+      linear-gradient(180deg, var(--paper-2), var(--paper));
+  }
+  .hero .video::before{
+    content:""; position:absolute; inset:18px;
+    border:1.5px dashed var(--ink); border-radius:6px;
+  }
+  .hero .video .vlabel{
+    position:absolute; top:30px; left:30px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    color:var(--ink); letter-spacing:0.14em; text-transform:uppercase;
+    background:var(--paper); padding:4px 10px; border:1.5px solid var(--ink);
+  }
+  .hero .video .corners span{
+    position:absolute; width:18px;height:18px; border:2px solid var(--ink);
+  }
+  .hero .video .corners .tl{top:30px;left:30px;border-right:0;border-bottom:0;}
+  .hero .video .corners .tr{top:30px;right:30px;border-left:0;border-bottom:0;}
+  .hero .video .corners .bl{bottom:30px;left:30px;border-right:0;border-top:0;}
+  .hero .video .corners .br{bottom:30px;right:30px;border-left:0;border-top:0;}
+  .hero .video .center-play{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .hero .video .timecode{
+    position:absolute; bottom:30px; right:30px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    background:var(--ink); color:var(--paper); padding:4px 10px;
+  }
+
+  /* ----- VARIANT A: classic ----- */
+  .v-a .hero{ height:620px; }
+  .v-a .hero .stack{
+    position:absolute; left:48px; bottom:48px; right:48px;
+    display:flex; align-items:flex-end; justify-content:space-between; gap:40px;
+  }
+  .v-a .hero h1{
+    font-family:'Caveat', cursive; font-weight:700;
+    font-size:104px; line-height:0.9; margin:0 0 14px;
+    letter-spacing:-0.01em;
+  }
+  .v-a .hero .kicker{
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    letter-spacing:0.3em; text-transform:uppercase; margin-bottom:18px;
+    color:var(--ink);
+  }
+  .v-a .hero .tagline{
+    font-family:'Architects Daughter', cursive; font-size:20px;
+    max-width:520px; margin:0 0 22px; color:var(--ink);
+  }
+  .v-a .cta-row{display:flex; gap:14px; align-items:center;}
+  .v-a .trailer-card{
+    border:2.5px solid var(--ink); padding:14px 18px;
+    background:var(--paper); display:flex; gap:14px; align-items:center;
+    min-width:280px;
+  }
+  .v-a .trailer-card .mini-play{
+    width:46px;height:46px;border-radius:999px;border:2px solid var(--ink);
+    display:grid;place-items:center; flex:none;
+  }
+  .v-a .trailer-card .mini-play::after{
+    content:""; width:0;height:0;
+    border-left:14px solid var(--ink);
+    border-top:9px solid transparent; border-bottom:9px solid transparent;
+    margin-left:3px;
+  }
+  .v-a .trailer-card .mt{font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase;}
+  .v-a .trailer-card .mb{font-family:'Architects Daughter', cursive; font-size:18px;}
+
+  .features-a{padding:64px 48px; border-top:2px solid var(--ink);}
+  .features-a .head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:28px;}
+  .features-a h2{font-family:'Caveat', cursive; font-size:56px; margin:0;}
+  .features-a .grid{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+  .feat-card{
+    border:2.5px solid var(--ink); padding:28px; min-height:340px;
+    display:flex; flex-direction:column; gap:16px; background:var(--paper);
+  }
+  .feat-card .img{
+    height:180px; border:1.5px dashed var(--ink);
+  }
+  .feat-card .num{font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:0.2em; color:var(--muted);}
+  .feat-card h3{font-family:'Caveat', cursive; font-size:40px; margin:0;}
+  .feat-card p{font-family:'Architects Daughter', cursive; font-size:16px; margin:0; line-height:1.5;}
+  .feat-card .tagline-row{display:flex; gap:8px; flex-wrap:wrap;}
+
+  .news{padding:64px 48px; border-top:2px solid var(--ink); background:var(--paper-2);}
+  .news .head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:28px;}
+  .news h2{font-family:'Caveat', cursive; font-size:56px; margin:0;}
+  .news .head a{font-family:'Architects Daughter', cursive; font-size:20px; border-bottom:2px solid var(--ink); padding-bottom:2px;}
+  .news .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px;}
+  .post{
+    background:var(--paper); border:2.5px solid var(--ink);
+    display:flex; flex-direction:column;
+  }
+  .post .img{height:170px; border-bottom:2px solid var(--ink);}
+  .post .body{padding:18px; display:flex; flex-direction:column; gap:8px;}
+  .post .meta{font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase;}
+  .post h4{font-family:'Caveat', cursive; font-size:30px; margin:0; line-height:1;}
+  .post p{font-family:'Architects Daughter', cursive; font-size:14px; margin:0; color:var(--ink);}
+  .post .more{font-family:'Architects Daughter', cursive; font-size:14px; margin-top:6px; border-bottom:1.5px solid var(--ink); align-self:flex-start;}
+
+  .megacta{
+    padding:96px 48px; border-top:2px solid var(--ink); background:var(--ink); color:var(--paper);
+    position:relative; overflow:hidden;
+  }
+  .megacta::before{
+    content:""; position:absolute; inset:0;
+    background-image: repeating-linear-gradient(135deg, rgba(245,241,232,0.08) 0 2px, transparent 2px 16px);
+    pointer-events:none;
+  }
+  .megacta .row{position:relative; display:flex; justify-content:space-between; align-items:center; gap:40px;}
+  .megacta h2{font-family:'Caveat', cursive; font-size:96px; margin:0; line-height:0.95;}
+  .megacta p{font-family:'Architects Daughter', cursive; font-size:20px; max-width:480px; margin:14px 0 0; color:var(--paper);}
+  .megacta .btn{background:var(--paper); color:var(--ink); font-size:24px; padding:20px 30px;}
+
+  .footer{
+    padding:48px; background:var(--paper); border-top:2px solid var(--ink);
+    display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:32px;
+  }
+  .footer .logo{font-family:'Caveat', cursive; font-weight:700; font-size:36px;}
+  .footer .col{display:flex; flex-direction:column; gap:8px;}
+  .footer .col .h{font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
+  .footer .col span{font-family:'Architects Daughter', cursive; font-size:16px;}
+  .footer .legal{
+    grid-column:1/-1; display:flex; justify-content:space-between;
+    border-top:1.5px dashed var(--ink); padding-top:18px;
+    font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); letter-spacing:0.1em;
+  }
+
+  /* ----- VARIANT B: split / asymmetric ----- */
+  .v-b .hero{ display:grid; grid-template-columns: 1.15fr 1fr; min-height:620px; }
+  .v-b .hero .left{
+    padding:60px 48px; display:flex; flex-direction:column; justify-content:space-between;
+    border-right:2px solid var(--ink); background:var(--paper);
+    position:relative;
+  }
+  .v-b .hero .crosshair{
+    position:absolute; top:30px; right:30px;
+    width:60px;height:60px; border:1.5px solid var(--ink); border-radius:999px;
+    display:grid;place-items:center;
+  }
+  .v-b .hero .crosshair::before, .v-b .hero .crosshair::after{
+    content:""; position:absolute; background:var(--ink);
+  }
+  .v-b .hero .crosshair::before{width:2px; height:80px; left:50%; top:-10px; transform:translateX(-50%);}
+  .v-b .hero .crosshair::after{height:2px; width:80px; top:50%; left:-10px; transform:translateY(-50%);}
+  .v-b .hero h1{
+    font-family:'Caveat', cursive; font-weight:700;
+    font-size:108px; line-height:0.86; margin:0;
+  }
+  .v-b .hero .h1-strike{position:relative; display:inline-block;}
+  .v-b .hero .h1-strike::after{
+    content:""; position:absolute; left:-6px; right:-6px; top:55%; height:6px; background:var(--neon);
+    z-index:-1;
+  }
+  .v-b .hero .meta-strip{
+    display:flex; gap:20px; margin-top:22px;
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    letter-spacing:0.18em; text-transform:uppercase;
+  }
+  .v-b .hero .meta-strip span{display:flex; gap:8px; align-items:center;}
+  .v-b .hero .tagline{font-family:'Architects Daughter', cursive; font-size:22px; max-width:460px; margin:20px 0 28px;}
+  .v-b .hero .cta-stack{display:flex; flex-direction:column; gap:14px; align-items:flex-start;}
+  .v-b .hero .cta-stack .row1{display:flex; gap:14px;}
+  .v-b .hero .trailer-box{
+    display:flex; gap:14px; align-items:center;
+    border:2.5px solid var(--ink); padding:12px 18px; background:var(--paper);
+  }
+  .v-b .hero .trailer-box .play{
+    width:42px;height:42px;border-radius:999px;border:2px solid var(--ink); position:relative;
+  }
+  .v-b .hero .trailer-box .play::after{
+    content:""; position:absolute; left:53%; top:50%; transform:translate(-50%,-50%);
+    border-left:12px solid var(--ink); border-top:8px solid transparent; border-bottom:8px solid transparent;
+  }
+  .v-b .hero .right{ position:relative; background:var(--paper-2);}
+  .v-b .hero .right .frame{position:absolute; inset:28px; border:2px solid var(--ink); }
+  .v-b .hero .right .scan{
+    position:absolute; inset:28px;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(27,27,27,0.05) 0 2px, transparent 2px 6px);
+  }
+  .v-b .hero .right .play-big{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .v-b .hero .right .tag-cyber{
+    position:absolute; left:50%; bottom:48px; transform:translateX(-50%);
+    background:var(--ink); color:var(--paper); padding:6px 14px;
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.2em;
+  }
+  .v-b .hero .right .tc{
+    position:absolute; top:44px; right:44px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    border:1.5px solid var(--ink); padding:4px 8px; background:var(--paper);
+  }
+
+  .features-b{padding:80px 48px; border-top:2px solid var(--ink); display:grid; grid-template-columns:1fr 1fr; gap:0;}
+  .features-b .col{
+    padding:32px; border:2.5px solid var(--ink); background:var(--paper);
+    min-height:360px; display:flex; flex-direction:column; gap:18px;
+  }
+  .features-b .col:first-child{margin-right:-2px;}
+  .features-b .col .num{font-family:'JetBrains Mono', monospace; font-size:14px; letter-spacing:0.2em; color:var(--muted);}
+  .features-b .col h3{font-family:'Caveat', cursive; font-size:44px; margin:0; line-height:1;}
+  .features-b .col .blurb{font-family:'Architects Daughter', cursive; font-size:18px; margin:0; line-height:1.5;}
+  .features-b .col .viz{flex:1; border:1.5px dashed var(--ink); min-height:160px; margin-top:8px;}
+  .features-b .col .chips{display:flex; gap:8px; flex-wrap:wrap;}
+
+  .news-b{padding:80px 48px; border-top:2px solid var(--ink);}
+  .news-b .head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px;}
+  .news-b h2{font-family:'Caveat', cursive; font-size:60px; margin:0;}
+  .news-b ul{list-style:none; padding:0; margin:0; border-top:2px solid var(--ink);}
+  .news-b li{
+    display:grid; grid-template-columns: 90px 110px 1fr 80px 20px;
+    align-items:center; gap:24px;
+    border-bottom:2px solid var(--ink); padding:22px 8px;
+  }
+  .news-b li .thumb{width:90px;height:60px; border:1.5px dashed var(--ink);}
+  .news-b li .tag{font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted);}
+  .news-b li .title{font-family:'Caveat', cursive; font-size:32px; line-height:1;}
+  .news-b li .date{font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--ink);}
+  .news-b li .arr{font-family:'JetBrains Mono', monospace; font-size:22px;}
+  .news-b .more{margin-top:24px; display:inline-flex;}
+
+  .megacta-b{
+    padding:80px 48px; border-top:2px solid var(--ink); background:var(--paper);
+    position:relative; overflow:hidden;
+  }
+  .megacta-b .strike{
+    position:absolute; left:-40px; right:-40px; top:48%;
+    height:140px; background:var(--ink); transform:rotate(-2deg);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--paper); gap:48px;
+  }
+  .megacta-b .strike h2{font-family:'Caveat', cursive; font-size:72px; margin:0;}
+  .megacta-b .strike .arrow{font-size:48px; color:var(--paper);}
+  .megacta-b .strike .btn{background:var(--neon); color:var(--ink); border-color:var(--paper); font-size:22px;}
+  .megacta-b .pad{height:280px;}
+
+  /* ----- VARIANT C: terminal / dossier ----- */
+  .v-c{background:var(--paper);}
+  .v-c .hero{
+    height:660px; position:relative;
+    border-bottom:2px solid var(--ink);
+  }
+  .v-c .hero .video{
+    background-image:
+      repeating-linear-gradient(0deg, rgba(27,27,27,0.05) 0 2px, transparent 2px 6px),
+      linear-gradient(180deg, var(--paper-2), var(--paper));
+  }
+  .v-c .hero .hud{
+    position:absolute; inset:0;
+    display:grid;
+    grid-template-rows: auto 1fr auto;
+    padding:30px;
+  }
+  .v-c .hero .hud-top{
+    display:flex; justify-content:space-between;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--ink);
+  }
+  .v-c .hero .hud-top .left, .v-c .hero .hud-top .right{display:flex; gap:14px;}
+  .v-c .hero .stack{
+    align-self:end; display:flex; align-items:flex-end; gap:36px;
+  }
+  .v-c .hero .h1block{display:flex; flex-direction:column; gap:8px; max-width:740px;}
+  .v-c .hero .codename{
+    font-family:'JetBrains Mono', monospace; font-size:13px;
+    letter-spacing:0.4em; text-transform:uppercase;
+    display:flex; gap:10px; align-items:center;
+  }
+  .v-c .hero .codename::before{content:""; width:42px; height:2px; background:var(--ink);}
+  .v-c .hero h1{
+    font-family:'Caveat', cursive; font-weight:700;
+    font-size:140px; line-height:0.82; margin:0; letter-spacing:-0.02em;
+  }
+  .v-c .hero h1 .accent{
+    background:var(--neon); padding:0 8px;
+  }
+  .v-c .hero .tagline{
+    font-family:'Architects Daughter', cursive; font-size:22px; max-width:520px; margin:6px 0 0;
+  }
+  .v-c .hero .cta-tower{
+    display:flex; flex-direction:column; gap:12px; min-width:330px;
+  }
+  .v-c .hero .cta-tower .primary{
+    border:2.5px solid var(--ink); background:var(--ink); color:var(--paper);
+    padding:18px 22px; display:flex; align-items:center; justify-content:space-between;
+    font-family:'Caveat', cursive; font-size:30px;
+  }
+  .v-c .hero .cta-tower .primary .glyph{font-family:'JetBrains Mono', monospace; font-size:18px;}
+  .v-c .hero .cta-tower .trailer{
+    border:2.5px solid var(--ink); padding:14px 18px; display:flex; gap:14px; align-items:center; background:var(--paper);
+  }
+  .v-c .hero .cta-tower .trailer .play{
+    width:50px;height:50px; border:2px solid var(--ink); border-radius:999px; position:relative;
+  }
+  .v-c .hero .cta-tower .trailer .play::after{
+    content:""; position:absolute; left:55%; top:50%; transform:translate(-50%,-50%);
+    border-left:14px solid var(--ink); border-top:9px solid transparent; border-bottom:9px solid transparent;
+  }
+  .v-c .hero .cta-tower .trailer .col{display:flex; flex-direction:column;}
+  .v-c .hero .cta-tower .trailer .a{font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.18em; color:var(--muted); text-transform:uppercase;}
+  .v-c .hero .cta-tower .trailer .b{font-family:'Architects Daughter', cursive; font-size:18px;}
+  .v-c .hero .cta-tower .trailer .duration{margin-left:auto; font-family:'JetBrains Mono', monospace; font-size:11px; border:1.5px solid var(--ink); padding:2px 8px;}
+  .v-c .hero .hud-bottom{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.16em; text-transform:uppercase; color:var(--muted);
+  }
+
+  .features-c{padding:80px 48px; display:grid; grid-template-columns:1fr 1fr; gap:32px; border-bottom:2px solid var(--ink);}
+  .features-c .card{
+    border:2.5px solid var(--ink); background:var(--paper);
+    display:grid; grid-template-rows: 200px 1fr; min-height:380px;
+  }
+  .features-c .card .head{
+    border-bottom:2px solid var(--ink);
+    background:
+      repeating-linear-gradient(135deg, rgba(27,27,27,0.06) 0 2px, transparent 2px 14px);
+    position:relative;
+  }
+  .features-c .card .head .key{
+    position:absolute; top:14px; left:14px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    background:var(--ink); color:var(--paper); padding:4px 10px;
+    letter-spacing:0.18em;
+  }
+  .features-c .card .head .ph{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    border:1.5px solid var(--ink); background:var(--paper); padding:6px 14px;
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.16em; text-transform:uppercase;
+  }
+  .features-c .card .body{padding:24px; display:flex; flex-direction:column; gap:12px;}
+  .features-c .card h3{font-family:'Caveat', cursive; font-size:42px; margin:0;}
+  .features-c .card p{font-family:'Architects Daughter', cursive; font-size:17px; margin:0; line-height:1.5;}
+  .features-c .card .specs{
+    display:flex; gap:20px; margin-top:8px; font-family:'JetBrains Mono', monospace;
+    font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted);
+  }
+  .features-c .card .specs b{color:var(--ink); font-weight:700;}
+
+  .news-c{padding:80px 48px; border-bottom:2px solid var(--ink); background:var(--paper-2);}
+  .news-c .head{
+    display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px;
+  }
+  .news-c h2{font-family:'Caveat', cursive; font-size:60px; margin:0;}
+  .news-c .head .right{display:flex; gap:12px; align-items:center; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase;}
+  .news-c .grid{display:grid; grid-template-columns: 1.4fr 1fr 1fr; gap:24px;}
+  .news-c .post{background:var(--paper); border:2.5px solid var(--ink); display:flex; flex-direction:column;}
+  .news-c .post.featured{grid-row:span 1;}
+  .news-c .post .img{height:220px; border-bottom:2px solid var(--ink); position:relative;}
+  .news-c .post.small .img{height:140px;}
+  .news-c .post .img .badge{
+    position:absolute; top:12px; left:12px;
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    background:var(--ink); color:var(--paper); padding:3px 8px; letter-spacing:0.18em;
+  }
+  .news-c .post .body{padding:18px; display:flex; flex-direction:column; gap:8px; flex:1;}
+  .news-c .post h4{font-family:'Caveat', cursive; font-size:30px; margin:0; line-height:1;}
+  .news-c .post.featured h4{font-size:38px;}
+  .news-c .post .meta{font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase;}
+  .news-c .post .more{font-family:'Architects Daughter', cursive; font-size:14px; border-bottom:1.5px solid var(--ink); align-self:flex-start; margin-top:auto;}
+  .news-c .more-link{
+    display:flex; align-items:center; gap:10px; margin-top:24px;
+    font-family:'Architects Daughter', cursive; font-size:22px;
+  }
+  .news-c .more-link .line{flex:1; border-top:2px dashed var(--ink);}
+
+  .megacta-c{
+    padding:120px 48px; background:var(--ink); color:var(--paper); position:relative; overflow:hidden;
+  }
+  .megacta-c::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(135deg, rgba(245,241,232,0.06) 0 2px, transparent 2px 14px);
+  }
+  .megacta-c .wrap{position:relative; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:18px; text-align:center;}
+  .megacta-c .small{font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:0.35em; text-transform:uppercase;}
+  .megacta-c h2{font-family:'Caveat', cursive; font-size:140px; margin:0; line-height:0.88;}
+  .megacta-c h2 .accent{ background:var(--neon); color:var(--ink); padding:0 14px;}
+  .megacta-c .row{display:flex; gap:18px; margin-top:14px;}
+  .megacta-c .btn{background:var(--paper); color:var(--ink); font-size:24px; padding:18px 28px;}
+  .megacta-c .btn.ghost{background:transparent; color:var(--paper); border-color:var(--paper);}
+  .megacta-c .meta{margin-top:16px; font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:0.24em;}
+
+  /* footer c */
+  .footer-c{
+    padding:48px; background:var(--paper);
+    display:grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap:32px;
+    border-top:2px solid var(--ink);
+  }
+  .footer-c .brand{display:flex; flex-direction:column; gap:14px;}
+  .footer-c .brand .logo{font-family:'Caveat', cursive; font-size:42px; font-weight:700;}
+  .footer-c .brand .sub{font-family:'Architects Daughter', cursive; font-size:14px; max-width:280px;}
+  .footer-c .brand .social{display:flex; gap:10px;}
+  .footer-c .brand .social span{width:34px;height:34px; border:2px solid var(--ink); display:grid; place-items:center; font-family:'JetBrains Mono', monospace; font-size:12px;}
+  .footer-c .col{display:flex; flex-direction:column; gap:8px;}
+  .footer-c .col .h{font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
+  .footer-c .col span{font-family:'Architects Daughter', cursive; font-size:16px;}
+  .footer-c .legal{
+    grid-column:1/-1; display:flex; justify-content:space-between; align-items:center;
+    border-top:1.5px dashed var(--ink); padding-top:18px;
+    font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); letter-spacing:0.1em;
+  }
+  .footer-c .legal .age{border:1.5px solid var(--ink); padding:4px 10px; color:var(--ink);}
+
+  /* annotations */
+  .anno{
+    position:absolute; pointer-events:none;
+    font-family:'Caveat', cursive; font-size:20px; color:var(--ink);
+  }
+  .anno.neon-pop{color: oklch(0.55 0.18 330);}
+  .swatch{display:inline-flex; gap:6px; align-items:center; font-family:'JetBrains Mono', monospace; font-size:11px;}
+  .swatch i{width:14px;height:14px;border:1.5px solid var(--ink); display:inline-block;}
+  .swatch i.neon{background:var(--neon);}
+  .swatch i.ink{background:var(--ink);}
+  .swatch i.paper{background:var(--paper);}
+
+  /* show only the active variant */
+  .variant{display:none;}
+  .variant.active{display:block;}
+
+  /* legend / hint */
+  .legend{
+    display:flex; gap:18px; flex-wrap:wrap; align-items:center;
+    margin-top:18px; padding:12px 16px;
+    border:1.5px dashed var(--ink); border-radius:6px;
+    background:var(--paper);
+  }
+  .legend .item{display:flex; gap:8px; align-items:center; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);}
+  .legend .item .b{width:24px;height:14px; border:2px solid var(--ink);}
+  .legend .item .b.dashed{border-style:dashed;}
+  .legend .item .b.x{background:var(--paper-2);}
+  .legend .item .b.ink{background:var(--ink);}
+  .legend .item .b.neon{background:var(--neon);}
+
+  /* notes panel */
+  .notes{
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px;
+    margin-top:20px;
+  }
+  .note{
+    border:1.5px dashed var(--ink); border-radius:6px;
+    padding:14px 16px; background:var(--paper);
+  }
+  .note .h{font-family:'Caveat', cursive; font-size:22px; font-weight:700;}
+  .note .b{font-family:'Architects Daughter', cursive; font-size:14px; line-height:1.5; margin-top:4px;}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="stage-head">
+    <div>
+      <div class="sub">wireframe · v0.1 · kunoichi.game</div>
+      <h1>Kunoichi — Landing Page Wireframes</h1>
+    </div>
+    <div class="tabbar" role="tablist" aria-label="Variants">
+      <button id="tab-a" role="tab" aria-selected="true" onclick="pick('a')">A · Classic</button>
+      <button id="tab-b" role="tab" aria-selected="false" onclick="pick('b')">B · Split / Strike</button>
+      <button id="tab-c" role="tab" aria-selected="false" onclick="pick('c')">C · Dossier / HUD</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="b"></span>solid = real component</div>
+    <div class="item"><span class="b dashed"></span>dashed = placeholder / asset</div>
+    <div class="item"><span class="b x"></span>striped = media slot</div>
+    <div class="item"><span class="b ink"></span>ink fill = emphasis</div>
+    <div class="item"><span class="b neon"></span>neon accent = brand pop</div>
+    <div class="item">type pairing: <b style="font-family:'Caveat',cursive; color:var(--ink);">Caveat</b> + <b style="font-family:'Architects Daughter',cursive;">Architects Daughter</b> + <b class="mono">JetBrains Mono</b></div>
+  </div>
+
+  <!-- ============ VARIANT A ============ -->
+  <section id="v-a" class="variant active v-a" aria-labelledby="tab-a">
+    <div class="layout">
+      <div class="layout-meta">
+        <span>variant A · classic / cinematic hero</span>
+        <span>1280 × full</span>
+      </div>
+
+      <!-- NAV -->
+      <div class="nav">
+        <div class="logo">Kunoichi</div>
+        <div class="links">
+          <span class="active">Home</span><span>World</span><span>Characters</span><span>Media</span><span>News</span><span>Store</span>
+        </div>
+        <div class="util">
+          <span class="pill"><span class="dot"></span>Servers Online</span>
+          <span class="pill mono">EN ▾</span>
+          <span class="pill mono">Log in</span>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="video">
+          <div class="corners"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+          <span class="vlabel">[ HERO VIDEO LOOP · 1920×1080 · muted, loop ]</span>
+          <div class="center-play">
+            <div class="play-bezel"></div>
+            <span class="mono" style="font-size:11px; letter-spacing:0.2em;">CINEMATIC · 00:00 / 02:14</span>
+          </div>
+          <div class="timecode">▶ TRAILER · 2:14</div>
+        </div>
+
+        <div class="stack">
+          <div>
+            <div class="kicker">Tokyo · 2087 · Sector 9</div>
+            <h1>KUNOICHI</h1>
+            <p class="tagline">A neon-soaked stealth-action RPG. Become the blade in the rain.</p>
+            <div class="cta-row">
+              <a class="btn neon" href="#">▶ PLAY NOW <span class="glyph">⌁</span></a>
+              <a class="btn" href="#">
+                <span style="width:22px;height:22px;border:2px solid currentColor;border-radius:99px;display:inline-grid;place-items:center;font-size:10px;">▶</span>
+                Watch Trailer · 2:14
+              </a>
+            </div>
+            <div style="margin-top:14px; font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase;">
+              PC · PS5 · Xbox Series · Steam ★★★★½
+            </div>
+          </div>
+          <span class="annotation" style="margin-bottom:14px;">↘ trailer CTA + primary CTA, bottom-left</span>
+        </div>
+      </div>
+
+      <!-- FEATURES -->
+      <div class="features-a">
+        <div class="head">
+          <h2>Two things that make it sing.</h2>
+          <span class="label">§02 · FEATURES</span>
+        </div>
+        <div class="grid">
+          <div class="feat-card">
+            <div class="placeholder-x img" data-note="gameplay GIF · stealth takedown"></div>
+            <span class="num">01 · COMBAT</span>
+            <h3>Silent Blade System</h3>
+            <p>Chain shadowstrikes, parries, and kunai throws into a single fluid rhythm. Eight stances. One body, one second to decide.</p>
+            <div class="tagline-row">
+              <span class="pill">parry</span><span class="pill">stealth</span><span class="pill">combos</span>
+            </div>
+          </div>
+          <div class="feat-card">
+            <div class="placeholder-x img" data-note="city render · neon rooftops"></div>
+            <span class="num">02 · WORLD</span>
+            <h3>Living Neo-Edo</h3>
+            <p>A vertical city of corp towers, rain-slick alleys, and rooftop shrines. Every NPC has a schedule, a debt, a secret you can sell.</p>
+            <div class="tagline-row">
+              <span class="pill">open world</span><span class="pill">factions</span><span class="pill">day/night</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEWS -->
+      <div class="news">
+        <div class="head">
+          <h2>From the Dispatch</h2>
+          <a href="#">read all updates →</a>
+        </div>
+        <div class="grid">
+          <article class="post">
+            <div class="placeholder-x img" data-note="key art · patch 0.7"></div>
+            <div class="body">
+              <span class="meta">PATCH NOTES · MAY 22</span>
+              <h4>0.7 — “Rooftop Rain” drops</h4>
+              <p>New rooftop traversal, two boss fights, and a brutal Photo Mode rebuild.</p>
+              <span class="more">read post →</span>
+            </div>
+          </article>
+          <article class="post">
+            <div class="placeholder-x img" data-note="dev blog · combat designer"></div>
+            <div class="body">
+              <span class="meta">DEV DIARY · MAY 09</span>
+              <h4>Designing the Eight Stances</h4>
+              <p>Combat lead breaks down how rhythm, risk, and silence shape every encounter.</p>
+              <span class="more">read post →</span>
+            </div>
+          </article>
+          <article class="post">
+            <div class="placeholder-x img" data-note="event · season 2"></div>
+            <div class="body">
+              <span class="meta">SEASON 02 · APR 28</span>
+              <h4>Tournament of Petals begins</h4>
+              <p>Compete weekly for limited masks, dyes, and a shot at the leaderboard.</p>
+              <span class="more">read post →</span>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- MEGA CTA -->
+      <div class="megacta">
+        <div class="row">
+          <div>
+            <h2>Slip into the<br>shadow.</h2>
+            <p>Free to try. 18+. Available on PC, PS5, Xbox Series, and Steam.</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
+            <a class="btn" href="#">▶ PLAY KUNOICHI</a>
+            <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--paper); letter-spacing:0.18em;">~ 4 GB · INSTANT PLAY</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="footer">
+        <div>
+          <div class="logo">Kunoichi</div>
+          <p style="font-family:'Architects Daughter',cursive; font-size:14px; max-width:300px; margin:8px 0 0;">A neon-soaked stealth-action RPG by Studio Hanzo.</p>
+        </div>
+        <div class="col"><span class="h">Game</span><span>About</span><span>Characters</span><span>World</span><span>Roadmap</span></div>
+        <div class="col"><span class="h">Community</span><span>Discord</span><span>Reddit</span><span>X / Twitter</span><span>YouTube</span></div>
+        <div class="col"><span class="h">Support</span><span>Help center</span><span>Status</span><span>Press kit</span><span>Contact</span></div>
+        <div class="legal">
+          <span>© 2087 Studio Hanzo · All rights reserved</span>
+          <span>Privacy · Terms · ESRB M · PEGI 18</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="note"><div class="h">↑ Hero rationale</div><div class="b">Full-bleed video loop, content bottom-left as requested. Neon primary CTA + bordered trailer CTA pair. Kicker line for setting/world.</div></div>
+      <div class="note"><div class="h">→ Features rationale</div><div class="b">Two equal cards. Each pairs a labeled media slot with a stance/feature name + 1-line value prop + 3 tag chips.</div></div>
+      <div class="note"><div class="h">↘ News rationale</div><div class="b">3 posts, equal weight. Meta caps tag what kind of update it is (patch / diary / event). "Read all" links to dispatch index.</div></div>
+    </div>
+  </section>
+
+  <!-- ============ VARIANT B ============ -->
+  <section id="v-b" class="variant v-b" aria-labelledby="tab-b">
+    <div class="layout">
+      <div class="layout-meta">
+        <span>variant B · split hero · strike-through CTA</span>
+        <span>1280 × full</span>
+      </div>
+
+      <div class="nav">
+        <div class="logo">Kunoichi</div>
+        <div class="links">
+          <span class="active">Home</span><span>World</span><span>Characters</span><span>Media</span><span>News</span><span>Store</span>
+        </div>
+        <div class="util">
+          <span class="pill"><span class="dot"></span>Live · Season 02</span>
+          <span class="pill mono">Log in</span>
+        </div>
+      </div>
+
+      <!-- HERO SPLIT -->
+      <div class="hero">
+        <div class="left">
+          <div>
+            <div class="mono" style="font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:var(--muted);">// dossier · subject 00 · k.</div>
+            <h1>
+              <span class="h1-strike">Kuno</span><br>
+              ichi.
+            </h1>
+            <p class="tagline">One blade between the corps and the city. Slip in. Settle the debt. Disappear.</p>
+            <div class="meta-strip">
+              <span><span class="dot"></span>Stealth · Action · RPG</span>
+              <span>Single-player + Co-op</span>
+            </div>
+          </div>
+          <div class="cta-stack">
+            <div class="row1">
+              <a class="btn primary" href="#" style="font-size:22px; padding:18px 26px;">▶ PLAY FREE</a>
+              <div class="trailer-box">
+                <div class="play"></div>
+                <div style="display:flex; flex-direction:column;">
+                  <span class="mono" style="font-size:10px; color:var(--muted); letter-spacing:0.18em;">WATCH</span>
+                  <span style="font-family:'Architects Daughter',cursive; font-size:18px;">Official Trailer · 2:14</span>
+                </div>
+              </div>
+            </div>
+            <div class="mono" style="font-size:11px; color:var(--muted); letter-spacing:0.16em;">PC · PS5 · XSX · STEAM</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="scan"></div>
+          <div class="frame"></div>
+          <div class="tc">REC · 00:42 / 02:14</div>
+          <div class="play-big">
+            <div class="play-bezel"></div>
+            <span class="mono" style="font-size:11px; letter-spacing:0.2em;">[ HERO VIDEO · LOOP ]</span>
+          </div>
+          <div class="tag-cyber">NEO-EDO · 2087 · LIVE FEED</div>
+        </div>
+      </div>
+
+      <!-- FEATURES -->
+      <div class="features-b">
+        <div class="col">
+          <div>
+            <span class="num">/01 ────</span>
+            <h3>Eight stances.<br>One blade.</h3>
+          </div>
+          <p class="blurb">Switch styles mid-combo. Read the enemy, change the rhythm, vanish before they hit the floor.</p>
+          <div class="chips"><span class="pill">parry</span><span class="pill">stealth</span><span class="pill">finishers</span></div>
+          <div class="placeholder-x viz" data-note="combat reel · stance switch"></div>
+        </div>
+        <div class="col">
+          <div>
+            <span class="num">/02 ────</span>
+            <h3>A city that<br>remembers you.</h3>
+          </div>
+          <p class="blurb">Every faction tracks your debts. The deeper you go, the louder the dogs bark. Pick your enemies carefully.</p>
+          <div class="chips"><span class="pill">reputation</span><span class="pill">factions</span><span class="pill">consequences</span></div>
+          <div class="placeholder-x viz" data-note="city map · faction heat"></div>
+        </div>
+      </div>
+
+      <!-- NEWS LIST -->
+      <div class="news-b">
+        <div class="head">
+          <h2>Dispatch.</h2>
+          <span class="label">§ updates · 03 of 142</span>
+        </div>
+        <ul>
+          <li>
+            <div class="placeholder-x thumb" data-note="img"></div>
+            <span class="tag">Patch · 0.7</span>
+            <span class="title">“Rooftop Rain” lands tonight</span>
+            <span class="date">MAY 22</span>
+            <span class="arr">→</span>
+          </li>
+          <li>
+            <div class="placeholder-x thumb" data-note="img"></div>
+            <span class="tag">Dev diary</span>
+            <span class="title">Designing the Eight Stances</span>
+            <span class="date">MAY 09</span>
+            <span class="arr">→</span>
+          </li>
+          <li>
+            <div class="placeholder-x thumb" data-note="img"></div>
+            <span class="tag">Season 02</span>
+            <span class="title">Tournament of Petals begins</span>
+            <span class="date">APR 28</span>
+            <span class="arr">→</span>
+          </li>
+        </ul>
+        <a class="btn more" href="#">read all updates →</a>
+      </div>
+
+      <!-- MEGA CTA STRIKE -->
+      <div class="megacta-b">
+        <div class="pad"></div>
+        <div class="strike">
+          <h2>Slip in.</h2>
+          <span class="arrow">↦</span>
+          <a class="btn neon" href="#">▶ PLAY KUNOICHI FREE</a>
+          <span class="arrow">↤</span>
+          <h2>Disappear.</h2>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="footer">
+        <div>
+          <div class="logo">Kunoichi</div>
+          <p style="font-family:'Architects Daughter',cursive; font-size:14px; max-width:300px; margin:8px 0 0;">Studio Hanzo · Tokyo / Berlin.</p>
+        </div>
+        <div class="col"><span class="h">Game</span><span>About</span><span>World</span><span>Characters</span><span>Roadmap</span></div>
+        <div class="col"><span class="h">Community</span><span>Discord</span><span>Reddit</span><span>YouTube</span><span>X</span></div>
+        <div class="col"><span class="h">Support</span><span>Help</span><span>Status</span><span>Press</span><span>Contact</span></div>
+        <div class="legal">
+          <span>© 2087 Studio Hanzo</span>
+          <span>Privacy · Terms · ESRB M</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="note"><div class="h">↑ Split hero</div><div class="b">Type-driven left side, video right. Strike-through on “Kuno-” gives a cyberpunk redact / glitch hint without leaning on neon gradients.</div></div>
+      <div class="note"><div class="h">→ Features</div><div class="b">Touching slabs (2px overlap) form a single dossier card. Bigger, type-led headlines.</div></div>
+      <div class="note"><div class="h">↘ News list</div><div class="b">Horizontal list = more density than a 3-card grid. Good if dispatch is a frequent thing and you want to feel like a feed.</div></div>
+    </div>
+  </section>
+
+  <!-- ============ VARIANT C ============ -->
+  <section id="v-c" class="variant v-c" aria-labelledby="tab-c">
+    <div class="layout">
+      <div class="layout-meta">
+        <span>variant C · HUD / dossier · full bleed</span>
+        <span>1280 × full</span>
+      </div>
+
+      <div class="nav">
+        <div class="logo">Kunoichi</div>
+        <div class="links">
+          <span class="active">Home</span><span>World</span><span>Characters</span><span>Media</span><span>News</span><span>Store</span>
+        </div>
+        <div class="util">
+          <span class="pill"><span class="dot"></span>Beta · Build 2087.05</span>
+          <span class="pill mono">Sign in</span>
+        </div>
+      </div>
+
+      <!-- HERO HUD -->
+      <div class="hero">
+        <div class="video"></div>
+        <div class="hud">
+          <div class="hud-top">
+            <div class="left">
+              <span>// FEED · SECTOR 9 · RAIN</span>
+              <span>LAT 35.689 · LON 139.692</span>
+            </div>
+            <div class="right">
+              <span>BUILD 2087.05.22</span>
+              <span>● REC</span>
+              <span>02:14</span>
+            </div>
+          </div>
+
+          <div class="stack">
+            <div class="h1block">
+              <span class="codename">Codename · KUNOICHI</span>
+              <h1>
+                Walk <span class="accent">soft.</span><br>
+                Strike <span class="accent">hard.</span>
+              </h1>
+              <p class="tagline">A neon-soaked stealth-action RPG. The corp owns the lights — you own the dark.</p>
+            </div>
+
+            <div class="cta-tower">
+              <a class="primary" href="#">▶ PLAY KUNOICHI <span class="glyph">⌁</span></a>
+              <div class="trailer">
+                <div class="play"></div>
+                <div class="col">
+                  <span class="a">▷ Watch</span>
+                  <span class="b">Official Trailer</span>
+                </div>
+                <span class="duration">2:14</span>
+              </div>
+              <div class="mono" style="font-size:11px; color:var(--muted); letter-spacing:0.16em; text-align:center;">PC · PS5 · XSX · STEAM · ESRB M</div>
+            </div>
+          </div>
+
+          <div class="hud-bottom">
+            <span>↓ scroll · dossier 02 · features</span>
+            <span>FREE TO TRY · 18+</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURES DOSSIER -->
+      <div class="features-c">
+        <div class="card">
+          <div class="head">
+            <span class="key">FEATURE · 01</span>
+            <span class="ph">[ COMBAT REEL · 16:9 ]</span>
+          </div>
+          <div class="body">
+            <h3>Silent Blade System</h3>
+            <p>Eight stances. Chain parries, throws, and shadowstrikes into a single rhythm. Every kill writes a verse.</p>
+            <div class="specs">
+              <span><b>8</b> stances</span>
+              <span><b>120+</b> finishers</span>
+              <span><b>0</b> quicktime</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="head">
+            <span class="key">FEATURE · 02</span>
+            <span class="ph">[ NEO-EDO FLYOVER · 16:9 ]</span>
+          </div>
+          <div class="body">
+            <h3>Living Neo-Edo</h3>
+            <p>A vertical city with seven warring factions. Wake at dusk, vanish by dawn. Your reputation precedes you — sometimes that's bad.</p>
+            <div class="specs">
+              <span><b>7</b> factions</span>
+              <span><b>1:1</b> day-night</span>
+              <span><b>40h+</b> story</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEWS -->
+      <div class="news-c">
+        <div class="head">
+          <h2>Field Dispatch.</h2>
+          <div class="right">
+            <span>// LAST 30 DAYS · 14 POSTS</span>
+            <span class="pill">All</span><span class="pill">Patches</span><span class="pill">Devlogs</span><span class="pill">Events</span>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="post featured">
+            <div class="placeholder-x img" data-note="key art · rooftop rain">
+              <div class="badge" style="position:absolute;top:12px;left:12px;font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--ink);color:var(--paper);padding:3px 8px;letter-spacing:0.18em;">PATCH · 0.7</div>
+            </div>
+            <div class="body">
+              <span class="meta">MAY 22 · 4 MIN READ</span>
+              <h4>“Rooftop Rain” — patch 0.7 drops tonight</h4>
+              <p style="font-family:'Architects Daughter',cursive; font-size:15px; margin:0; line-height:1.5;">New rooftop traversal, two boss fights, a brutal Photo Mode rebuild, and the first co-op dungeon.</p>
+              <span class="more">read post →</span>
+            </div>
+          </article>
+          <article class="post small">
+            <div class="placeholder-x img" data-note="dev diary">
+              <div class="badge" style="position:absolute;top:12px;left:12px;font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--ink);color:var(--paper);padding:3px 8px;letter-spacing:0.18em;">DEV DIARY</div>
+            </div>
+            <div class="body">
+              <span class="meta">MAY 09</span>
+              <h4>Designing the Eight Stances</h4>
+              <span class="more">read post →</span>
+            </div>
+          </article>
+          <article class="post small">
+            <div class="placeholder-x img" data-note="season event">
+              <div class="badge" style="position:absolute;top:12px;left:12px;font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--ink);color:var(--paper);padding:3px 8px;letter-spacing:0.18em;">SEASON 02</div>
+            </div>
+            <div class="body">
+              <span class="meta">APR 28</span>
+              <h4>Tournament of Petals begins</h4>
+              <span class="more">read post →</span>
+            </div>
+          </article>
+        </div>
+        <div class="more-link">
+          <span class="line"></span>
+          <a href="#" style="border-bottom:2px solid var(--ink);">read every dispatch →</a>
+          <span class="line"></span>
+        </div>
+      </div>
+
+      <!-- MEGA CTA -->
+      <div class="megacta-c">
+        <div class="wrap">
+          <span class="small">// END · TRANSMISSION</span>
+          <h2>The city is <span class="accent">waiting.</span></h2>
+          <div class="row">
+            <a class="btn" href="#">▶ PLAY KUNOICHI FREE</a>
+            <a class="btn ghost" href="#">▷ Watch Trailer · 2:14</a>
+          </div>
+          <span class="meta">FREE TO TRY · PC · PS5 · XBOX SERIES · ESRB M</span>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="footer-c">
+        <div class="brand">
+          <div class="logo">Kunoichi</div>
+          <p class="sub">A neon-soaked stealth-action RPG by Studio Hanzo. Tokyo / Berlin.</p>
+          <div class="social">
+            <span>D</span><span>X</span><span>R</span><span>Y</span><span>IG</span>
+          </div>
+        </div>
+        <div class="col"><span class="h">Game</span><span>About</span><span>Characters</span><span>World</span><span>Roadmap</span></div>
+        <div class="col"><span class="h">Media</span><span>Trailers</span><span>Screenshots</span><span>Wallpapers</span><span>Press kit</span></div>
+        <div class="col"><span class="h">Community</span><span>Discord</span><span>Reddit</span><span>YouTube</span><span>X / Twitter</span></div>
+        <div class="col"><span class="h">Support</span><span>Help center</span><span>Status</span><span>Refunds</span><span>Contact</span></div>
+        <div class="legal">
+          <span>© 2087 Studio Hanzo · Built in Tokyo &amp; Berlin</span>
+          <span class="age">M · 17+ · MATURE · BLOOD · LANGUAGE · VIOLENCE</span>
+          <span>Privacy · Terms · Cookies</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="note"><div class="h">↑ HUD hero</div><div class="b">Diegetic chrome (LAT/LON, REC, build #) does the cyberpunk lifting without leaning on heavy gradients. Headline + CTAs anchor bottom-left/right.</div></div>
+      <div class="note"><div class="h">→ Dossier features</div><div class="b">Each feature reads like a file: keyed media slab on top, stats row at the bottom. More authoritative than soft cards.</div></div>
+      <div class="note"><div class="h">↘ Featured + 2</div><div class="b">One large dispatch + two small. Filter chips show this can scale into a real news index later.</div></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  function pick(v){
+    for (const k of ['a','b','c']){
+      document.getElementById('tab-'+k).setAttribute('aria-selected', k===v ? 'true':'false');
+      document.getElementById('v-'+k).classList.toggle('active', k===v);
+    }
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+</script>
+</body>
+</html>

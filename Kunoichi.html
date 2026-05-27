@@ -1,0 +1,1502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>KUNOICHI — Walk soft. Strike hard.</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;500;700;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     KUNOICHI — landing page
+     System: Ukiyo-e cyber. Vermillion + bone + ink.
+     Type:   Shippori Mincho B1 (display, JP serif)
+             Zen Kaku Gothic New (sans / UI)
+             JetBrains Mono (numerics, HUD)
+     ============================================================ */
+  :root{
+    --ink: #0a0a0a;
+    --ink-2: #131313;
+    --ink-3: #1c1c1c;
+    --paper: #ece7da;
+    --paper-2: #d8d2c1;
+    --bone: #f3efe4;
+    --muted: #8a857d;
+    --rule: #2a2825;
+    --vermillion: #d8232a;
+    --vermillion-2: #b51a20;
+    --gold: #c9a25f;
+    --hover: rgba(255,255,255,0.06);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Zen Kaku Gothic New', system-ui, sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    line-height:1.5;
+  }
+
+  /* shared paper grain — subtle overlay we can drop onto any dark surface */
+  .grain::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 3px 3px, 5px 5px;
+    background-position: 0 0, 2px 2px;
+    mix-blend-mode:overlay;
+    z-index:2;
+  }
+
+  .mono{ font-family:'JetBrains Mono', ui-monospace, monospace; font-feature-settings:"tnum" 1; }
+  .mincho{ font-family:'Shippori Mincho B1', serif; }
+  .kana{ font-family:'Shippori Mincho B1', serif; }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:grid; grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    padding:18px 32px;
+    color:var(--paper);
+    transition:background .3s ease, backdrop-filter .3s ease, border-color .3s ease;
+    border-bottom:1px solid transparent;
+  }
+  .nav.scrolled{
+    background: rgba(10,10,10,0.78);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .nav .brand{
+    display:flex; align-items:center; gap:14px;
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:700; font-size:22px; letter-spacing:0.08em;
+  }
+  .nav .brand .seal{
+    width:34px;height:34px;border-radius:999px;
+    background:var(--vermillion);
+    display:grid;place-items:center;
+    color:var(--bone);
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:800;
+    font-size:18px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.25);
+  }
+  .nav .links{
+    display:flex; gap:30px; justify-self:center;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:500;
+    font-size:13px; letter-spacing:0.16em; text-transform:uppercase;
+  }
+  .nav .links a{
+    color: rgba(236,231,218,0.7); text-decoration:none; position:relative; padding:6px 0;
+    transition: color .2s ease;
+  }
+  .nav .links a:hover{ color:var(--paper); }
+  .nav .links a.active{ color:var(--paper); }
+  .nav .links a.active::after{
+    content:""; position:absolute; left:0; right:0; bottom:-2px; height:2px; background:var(--vermillion);
+  }
+  .nav .util{ display:flex; gap:10px; align-items:center; justify-self:end; }
+  .nav .util .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid rgba(255,255,255,0.16);
+    padding:6px 12px; border-radius:999px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.1em; color: rgba(236,231,218,0.85);
+  }
+  .nav .util .pill .dot{ width:7px;height:7px;border-radius:999px;background:#5cd16b; box-shadow:0 0 8px #5cd16b;}
+  .nav .util .signin{
+    border:1px solid var(--paper);
+    color:var(--paper);
+    padding:8px 16px; border-radius:0;
+    font-family:'Zen Kaku Gothic New', sans-serif; font-weight:500; font-size:13px;
+    letter-spacing:0.16em; text-transform:uppercase;
+    background:transparent; cursor:pointer; text-decoration:none;
+    transition: background .15s ease, color .15s ease;
+  }
+  .nav .util .signin:hover{ background:var(--paper); color:var(--ink); }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    overflow:hidden;
+    color:var(--paper);
+    isolation:isolate;
+  }
+  .hero .bg{
+    position:absolute; inset:0; z-index:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position: center center;
+    background-color:#1a0606;
+  }
+  /* full coverage scrim — dark in the bottom-left where content sits, transparent across the character */
+  .hero .scrim{
+    position:absolute; inset:0; z-index:1;
+    background:
+      linear-gradient(180deg, rgba(10,5,5,0.25) 0%, rgba(10,5,5,0) 18%, rgba(10,5,5,0) 55%, rgba(10,5,5,0.92) 100%),
+      linear-gradient(75deg, rgba(10,5,5,0.92) 0%, rgba(10,5,5,0.6) 22%, rgba(10,5,5,0.0) 48%);
+  }
+  .hero .scanlines{
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 3px);
+    mix-blend-mode:multiply;
+    opacity:0.45;
+  }
+  .hero .vignette{
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    background: radial-gradient(ellipse at 60% 50%, transparent 35%, rgba(0,0,0,0.5) 100%);
+  }
+
+  /* HUD chrome corners */
+  .hud-corner{
+    position:absolute; width:34px; height:34px; z-index:3;
+    border-color: rgba(236,231,218,0.55);
+    border-style:solid; border-width:0;
+  }
+  .hud-corner.tl{ top:90px; left:32px; border-top-width:1.5px; border-left-width:1.5px;}
+  .hud-corner.tr{ top:90px; right:32px; border-top-width:1.5px; border-right-width:1.5px;}
+  .hud-corner.bl{ bottom:32px; left:32px; border-bottom-width:1.5px; border-left-width:1.5px;}
+  .hud-corner.br{ bottom:32px; right:32px; border-bottom-width:1.5px; border-right-width:1.5px;}
+
+  .hud-tag{
+    position:absolute; z-index:4;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.22em; text-transform:uppercase;
+    color: rgba(236,231,218,0.72);
+  }
+  .hud-tag.tl{ top:96px; left:74px;}
+  .hud-tag.tr{ top:96px; right:74px; text-align:right;}
+  .hud-tag.tr .row{display:block;}
+  .hud-tag.tr .row.red{ color:var(--vermillion); }
+  .hud-tag .row + .row{ margin-top:4px; }
+
+  /* vertical kana on the right edge — sits past the character */
+  .hero .vertical-kana{
+    position:absolute; right:38px; top:50%; transform:translateY(-50%); z-index:4;
+    writing-mode: vertical-rl;
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:500;
+    font-size:13px;
+    letter-spacing:0.5em;
+    color: rgba(236,231,218,0.6);
+    line-height:1.2;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  }
+  .hero .vertical-kana .accent{ color:var(--bone); opacity:0.4; }
+
+  /* hanko / seal mark - big circle red stamp */
+  .hanko{
+    position:absolute; z-index:5;
+    width:148px;height:148px;border-radius:999px;
+    border:3px solid var(--vermillion);
+    color:var(--vermillion);
+    display:flex; align-items:center; justify-content:center;
+    transform:rotate(-8deg);
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:800;
+    font-size:64px;
+    background: radial-gradient(circle at 40% 35%, rgba(216,35,42,0.15), transparent 70%);
+    box-shadow: 0 0 60px rgba(216,35,42,0.25);
+    user-select:none;
+  }
+  .hanko::before{
+    content:""; position:absolute; inset:8px; border-radius:999px; border:1px solid var(--vermillion); opacity:0.6;
+  }
+  .hanko.hero-hanko{ top:140px; right:80px; width:118px; height:118px; font-size:50px; opacity:0.92;}
+
+  /* CONTENT block in the hero */
+  .hero .content{
+    position:absolute; left:64px; bottom:88px; right:64px;
+    z-index:5;
+    display:grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items:end;
+    gap:48px;
+  }
+  .hero .stack{ display:flex; flex-direction:column; gap:14px; max-width: 820px; }
+
+  .kicker{
+    display:inline-flex; align-items:center; gap:14px;
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    letter-spacing:0.32em; text-transform:uppercase;
+    color: rgba(236,231,218,0.85);
+  }
+  .kicker::before{
+    content:""; width:46px; height:2px; background:var(--vermillion); display:inline-block;
+  }
+  .kicker .ji{ font-family:'Shippori Mincho B1', serif; color:var(--vermillion); font-size:18px; letter-spacing:0; margin-left:6px;}
+
+  h1.title{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:800;
+    font-size: clamp(52px, 7.5vw, 112px);
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--bone);
+    text-shadow: 0 4px 40px rgba(0,0,0,0.5);
+  }
+  h1.title .dot-red{
+    color: var(--vermillion);
+  }
+
+  .subtitle{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:500;
+    font-size: clamp(18px, 1.6vw, 22px);
+    color: rgba(236,231,218,0.85);
+    max-width: 540px;
+    margin: 6px 0 0;
+    line-height:1.4;
+  }
+
+  /* CTA cluster */
+  .cta-row{
+    display:flex; gap:14px; align-items:center;
+    margin-top:24px;
+  }
+  .btn{
+    appearance:none; cursor:pointer;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:700;
+    font-size:14px; letter-spacing:0.22em; text-transform:uppercase;
+    text-decoration:none;
+    padding:18px 28px;
+    display:inline-flex; align-items:center; gap:12px;
+    border:1px solid transparent;
+    transition: transform .15s ease, background .15s ease, color .15s ease, box-shadow .2s ease;
+    position:relative;
+  }
+  .btn:active{ transform: translateY(1px); }
+  .btn.primary{
+    background: var(--vermillion);
+    color: var(--bone);
+    border-color: var(--vermillion);
+    box-shadow: 0 0 0 1px var(--ink), 0 0 0 2px var(--vermillion), 0 8px 30px rgba(216,35,42,0.35);
+  }
+  .btn.primary:hover{
+    background: var(--vermillion-2);
+    box-shadow: 0 0 0 1px var(--ink), 0 0 0 2px var(--vermillion-2), 0 12px 40px rgba(216,35,42,0.5);
+  }
+  .btn.primary .arrow{ font-family:'JetBrains Mono', monospace; font-weight:400; }
+  .btn.ghost{
+    background: rgba(10,10,10,0.5);
+    color: var(--paper);
+    border-color: rgba(236,231,218,0.6);
+    backdrop-filter: blur(6px);
+  }
+  .btn.ghost:hover{
+    background: rgba(236,231,218,0.08);
+    border-color: var(--paper);
+  }
+  /* trailer card — small box CTA with thumbnail + meta */
+  .trailer-card{
+    display:flex; gap:14px; align-items:center;
+    padding:10px;
+    background: rgba(10,10,10,0.45);
+    border:1px solid rgba(236,231,218,0.22);
+    backdrop-filter: blur(8px);
+    text-decoration:none;
+    color: var(--paper);
+    min-width: 320px;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .trailer-card:hover{
+    border-color: var(--paper);
+    background: rgba(236,231,218,0.06);
+  }
+  .trailer-card .thumb{
+    position:relative;
+    width:88px; height:56px;
+    background-image:
+      url('https://images.unsplash.com/photo-1554797589-7241bb691973?w=400&q=80&auto=format&fit=crop');
+    background-size:cover; background-position:center;
+    flex:none;
+    filter: brightness(0.7);
+  }
+  .trailer-card .thumb::after{
+    content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:0;height:0;
+    border-left: 12px solid var(--bone);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7));
+  }
+  .trailer-card .meta{ display:flex; flex-direction:column; gap:3px;}
+  .trailer-card .meta .l1{
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:0.22em; text-transform:uppercase;
+    color: rgba(236,231,218,0.6);
+  }
+  .trailer-card .meta .l2{
+    font-family:'Shippori Mincho B1', serif; font-weight:500; font-size:16px;
+    color: var(--paper); line-height:1.1;
+  }
+  .trailer-card .meta .l3{
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    color: rgba(236,231,218,0.55);
+    letter-spacing:0.12em;
+  }
+
+  .platform-row{
+    margin-top:18px;
+    display:flex; gap:16px; align-items:center;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    color: rgba(236,231,218,0.55);
+    letter-spacing:0.22em; text-transform:uppercase;
+  }
+  .platform-row .sep{ opacity:0.4; }
+  .platform-row .stars{ color: var(--gold);}
+
+  /* scroll cue (bottom right of hero content) */
+  .scroll-cue{
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.2em; text-transform:uppercase;
+    color: rgba(236,231,218,0.55);
+    writing-mode: vertical-rl;
+    padding-bottom:6px;
+  }
+  .scroll-cue .line{
+    height: 70px; width:1px; background: linear-gradient(180deg, rgba(236,231,218,0.6), transparent);
+    margin-bottom: 12px;
+  }
+
+  /* ---------- SECTION HEAD shared ---------- */
+  .section-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap:32px; margin-bottom:40px;
+  }
+  .section-head .eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    letter-spacing:0.28em; text-transform:uppercase;
+    color: rgba(236,231,218,0.55);
+    display:flex; align-items:center; gap:14px;
+  }
+  .section-head .eyebrow::before{
+    content:""; width:36px; height:1.5px; background:var(--vermillion); display:inline-block;
+  }
+  .section-head h2{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:700;
+    font-size: clamp(40px, 5vw, 64px);
+    margin: 10px 0 0;
+    line-height: 1.0;
+    letter-spacing:-0.01em;
+  }
+  .section-head .right{
+    display:flex; flex-direction:column; align-items:flex-end; gap:8px;
+    text-align:right;
+    color: rgba(236,231,218,0.65);
+  }
+  .section-head .right .mono{ font-size:11px; letter-spacing:0.22em; text-transform:uppercase;}
+  .section-head .right .kana{ font-size:34px; color: rgba(236,231,218,0.18);}
+
+  /* ---------- FEATURES ---------- */
+  .features{
+    position:relative;
+    padding: 120px 64px;
+    background: var(--ink);
+  }
+  .features::before{
+    content:""; position:absolute; left:0; right:0; top:0; height:1px;
+    background: linear-gradient(90deg, transparent, rgba(236,231,218,0.18), transparent);
+  }
+  .features .grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 36px;
+  }
+  .feat{
+    position:relative;
+    background: var(--ink-2);
+    border:1px solid rgba(236,231,218,0.08);
+    overflow:hidden;
+    display:flex; flex-direction:column;
+    transition: border-color .25s ease, transform .25s ease;
+  }
+  .feat:hover{
+    border-color: rgba(216,35,42,0.6);
+    transform: translateY(-2px);
+  }
+  .feat .media{
+    position:relative; aspect-ratio: 16 / 9;
+    background-size:cover; background-position:center;
+    filter: saturate(0.6) contrast(1.1);
+  }
+  .feat .media::after{
+    content:""; position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(10,10,10,0) 50%, rgba(10,10,10,0.95) 100%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px);
+  }
+  .feat .media .badge{
+    position:absolute; top:18px; left:18px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.22em; text-transform:uppercase;
+    background: rgba(10,10,10,0.7);
+    border:1px solid rgba(236,231,218,0.3);
+    backdrop-filter: blur(6px);
+    color: var(--paper);
+    padding:6px 12px;
+  }
+  .feat .media .num{
+    position:absolute; bottom:18px; left:18px;
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:800; font-size:80px; line-height:0.8;
+    color: var(--vermillion);
+    z-index:2;
+    letter-spacing:-0.04em;
+  }
+  .feat .media .num .o{ color: var(--paper); opacity:0.4; font-weight:400; font-size:0.5em; vertical-align:top; margin-right:6px; letter-spacing:0.2em;}
+  .feat .body{
+    padding: 36px 32px 32px;
+    display:flex; flex-direction:column; gap:14px;
+    flex:1;
+  }
+  .feat .kana-mark{
+    font-family:'Shippori Mincho B1', serif; color: var(--vermillion); font-size:18px;
+    letter-spacing:0.2em;
+  }
+  .feat h3{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:700; font-size: 36px; line-height: 1.05;
+    margin:0;
+    color: var(--bone);
+    letter-spacing:-0.01em;
+  }
+  .feat .desc{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:400; font-size:15px; line-height:1.6;
+    color: rgba(236,231,218,0.7);
+    margin:0;
+    max-width: 48ch;
+  }
+  .feat .tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
+  .feat .tags span{
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.16em; text-transform:uppercase;
+    border:1px solid rgba(236,231,218,0.18);
+    padding:5px 10px; color: rgba(236,231,218,0.65);
+  }
+  .feat .specs{
+    margin-top: auto; padding-top: 24px;
+    border-top:1px dashed rgba(236,231,218,0.15);
+    display:flex; gap:32px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.18em; text-transform:uppercase;
+    color: rgba(236,231,218,0.55);
+  }
+  .feat .specs b{
+    display:block; color: var(--paper); font-family:'Shippori Mincho B1', serif;
+    font-weight:700; font-size:24px; letter-spacing:0; text-transform:none;
+    margin-bottom:2px;
+  }
+
+  /* ---------- NEWS ---------- */
+  .news{
+    position:relative;
+    padding: 120px 64px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .news::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image: radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px);
+    background-size: 3px 3px; opacity:0.5;
+  }
+  .news .section-head h2{ color:var(--ink); }
+  .news .section-head .eyebrow{ color: rgba(10,10,10,0.55); }
+  .news .section-head .eyebrow::before{ background:var(--vermillion);}
+  .news .section-head .right{ color: rgba(10,10,10,0.5);}
+  .news .section-head .right .kana{ color: rgba(10,10,10,0.12);}
+
+  .news .grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 32px; position:relative;}
+  .post{
+    background: var(--bone);
+    border:1px solid rgba(10,10,10,0.1);
+    display:flex; flex-direction:column;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    text-decoration:none; color:inherit;
+    cursor:pointer;
+  }
+  .post:hover{
+    transform: translateY(-4px);
+    border-color: rgba(216,35,42,0.6);
+    box-shadow: 0 14px 32px rgba(10,10,10,0.12);
+  }
+  .post .media{
+    aspect-ratio: 16/10; position:relative;
+    background-size:cover; background-position:center;
+    filter: saturate(0.8) contrast(1.05);
+  }
+  .post .media .tag{
+    position:absolute; top:14px; left:14px;
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:0.22em; text-transform:uppercase;
+    background: var(--vermillion); color:var(--bone);
+    padding:5px 10px;
+  }
+  .post .media .tag.dev{ background: var(--ink); }
+  .post .media .tag.event{ background: var(--gold); color: var(--ink);}
+  .post .body{ padding: 24px 24px 28px; display:flex; flex-direction:column; gap:10px; flex:1;}
+  .post .meta{
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.2em; text-transform:uppercase;
+    color: rgba(10,10,10,0.55);
+  }
+  .post h4{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:700; font-size:24px; line-height:1.2; margin:0;
+    color: var(--ink); letter-spacing:-0.01em;
+  }
+  .post p{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:400; font-size:14px; line-height:1.6;
+    color: rgba(10,10,10,0.7);
+    margin:0;
+  }
+  .post .more{
+    margin-top: auto; padding-top:14px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.22em; text-transform:uppercase;
+    color: var(--vermillion); display:inline-flex; align-items:center; gap:8px;
+  }
+  .post:hover .more .arrow{ transform: translateX(4px); }
+  .post .more .arrow{ transition: transform .2s ease;}
+
+  .news .read-all{
+    margin-top: 56px;
+    display:flex; align-items:center; gap:24px;
+  }
+  .news .read-all .line{
+    flex:1; height:1px;
+    background: repeating-linear-gradient(90deg, rgba(10,10,10,0.4) 0 6px, transparent 6px 12px);
+  }
+  .news .read-all a{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:700; font-size:14px; letter-spacing:0.24em; text-transform:uppercase;
+    color: var(--ink);
+    text-decoration:none;
+    border-bottom:2px solid var(--vermillion); padding-bottom:4px;
+    display:inline-flex; align-items:center; gap:10px;
+  }
+
+  /* ---------- MEGA CTA ---------- */
+  .mega{
+    position:relative; overflow:hidden;
+    padding: 160px 64px;
+    background: var(--ink);
+    color: var(--paper);
+    isolation:isolate;
+  }
+  .mega .bg{
+    position:absolute; inset:0; z-index:0;
+    background-image: url('assets/feature-02.jpeg');
+    background-size:cover; background-position:center;
+    filter: brightness(0.4) saturate(0.8) contrast(1.05);
+  }
+  .mega .scrim{
+    position:absolute; inset:0; z-index:1;
+    background:
+      linear-gradient(180deg, rgba(10,10,10,0.6), rgba(10,10,10,0.85)),
+      radial-gradient(ellipse at center, transparent 0%, rgba(10,10,10,0.7) 80%);
+  }
+  .mega .scanlines{
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px);
+    mix-blend-mode: multiply;
+  }
+  .mega .wrap{ position:relative; z-index:3; text-align:center; max-width: 1100px; margin:0 auto;}
+  .mega .eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    letter-spacing:0.4em; text-transform:uppercase;
+    color: rgba(236,231,218,0.7);
+    display:inline-flex; align-items:center; gap:14px;
+    margin-bottom: 24px;
+  }
+  .mega .eyebrow::before, .mega .eyebrow::after{
+    content:""; width:48px; height:1px; background: rgba(236,231,218,0.5);
+  }
+  .mega h2{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:800;
+    font-size: clamp(64px, 9vw, 144px);
+    line-height: 0.92;
+    margin: 0;
+    letter-spacing:-0.02em;
+    color: var(--bone);
+  }
+  .mega h2 .red{ color: var(--vermillion); }
+  .mega .kana-row{
+    margin-top: 14px;
+    font-family:'Shippori Mincho B1', serif; font-size: 22px;
+    letter-spacing: 0.6em; color: rgba(236,231,218,0.45);
+  }
+  .mega .row{
+    margin-top: 56px;
+    display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+  }
+  .mega .btn{ font-size:14px; padding: 22px 36px;}
+  .mega .meta{
+    margin-top: 36px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.28em; text-transform:uppercase;
+    color: rgba(236,231,218,0.55);
+  }
+  .mega .hanko{ top:8%; right:6%; }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    background: var(--ink);
+    border-top:1px solid rgba(236,231,218,0.08);
+    padding: 64px;
+  }
+  .footer-grid{
+    display:grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
+  }
+  .footer-brand{ display:flex; flex-direction:column; gap:14px;}
+  .footer-brand .logo-row{ display:flex; align-items:center; gap:12px;}
+  .footer-brand .logo{
+    font-family:'Shippori Mincho B1', serif; font-weight:800; font-size:28px; letter-spacing:0.08em;
+  }
+  .footer-brand .seal{
+    width:34px;height:34px;border-radius:999px; background:var(--vermillion);
+    display:grid;place-items:center; color:var(--bone);
+    font-family:'Shippori Mincho B1', serif; font-weight:800; font-size:18px;
+  }
+  .footer-brand p{
+    font-family:'Zen Kaku Gothic New', sans-serif; font-size:13px; line-height:1.6;
+    color: rgba(236,231,218,0.55); max-width: 280px; margin:0;
+  }
+  .footer-brand .social{ display:flex; gap:8px; margin-top:6px;}
+  .footer-brand .social a{
+    width:36px; height:36px; display:grid; place-items:center;
+    border:1px solid rgba(236,231,218,0.18);
+    color: rgba(236,231,218,0.75);
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    text-decoration:none; transition: all .15s ease;
+  }
+  .footer-brand .social a:hover{
+    border-color: var(--vermillion); color:var(--vermillion);
+  }
+  .footer-col h5{
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.22em; text-transform:uppercase;
+    color: rgba(236,231,218,0.5);
+    margin: 0 0 18px;
+    font-weight:500;
+  }
+  .footer-col ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;}
+  .footer-col li a{
+    font-family:'Zen Kaku Gothic New', sans-serif; font-size:14px;
+    color: rgba(236,231,218,0.8); text-decoration:none;
+  }
+  .footer-col li a:hover{ color: var(--vermillion);}
+
+  .footer-legal{
+    margin-top: 56px; padding-top:24px;
+    border-top:1px dashed rgba(236,231,218,0.12);
+    display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.16em; text-transform:uppercase;
+    color: rgba(236,231,218,0.4);
+  }
+  .footer-legal .rating{
+    border:1px solid rgba(236,231,218,0.3);
+    color: rgba(236,231,218,0.7);
+    padding:5px 10px;
+  }
+  .footer-legal .build{ color: var(--vermillion);}
+
+  /* ---------- TWEAKS PANEL ---------- */
+  .tweaks-panel{
+    position:fixed; right:18px; bottom:18px; z-index:100;
+    width: 280px;
+    background: rgba(15,15,15,0.94);
+    color: var(--paper);
+    border: 1px solid rgba(236,231,218,0.18);
+    box-shadow: 0 14px 60px rgba(0,0,0,0.5);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    padding: 0;
+    display:none;
+    backdrop-filter: blur(10px);
+  }
+  .tweaks-panel.open{ display:block; }
+  .tweaks-panel .tp-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(236,231,218,0.1);
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.18em; text-transform:uppercase;
+    color: rgba(236,231,218,0.85);
+  }
+  .tweaks-panel .tp-head .x{
+    background:transparent; border:0; color:rgba(236,231,218,0.6); cursor:pointer;
+    font-family:'JetBrains Mono', monospace; font-size:14px;
+  }
+  .tweaks-panel .tp-body{ padding: 14px; display:flex; flex-direction:column; gap:18px;}
+  .tweak-group label{
+    display:block;
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:0.2em; text-transform:uppercase;
+    color: rgba(236,231,218,0.55); margin-bottom:8px;
+  }
+  .swatches{ display:flex; gap:8px;}
+  .swatches button{
+    width:32px; height:32px; border-radius:0; cursor:pointer;
+    border:2px solid transparent;
+    transition: all .15s ease;
+    position:relative;
+  }
+  .swatches button.active{ border-color: var(--paper); transform: scale(1.05);}
+  .segs{ display:flex; gap:0; border:1px solid rgba(236,231,218,0.18);}
+  .segs button{
+    flex:1; appearance:none; background:transparent; color: rgba(236,231,218,0.75);
+    border:0; padding:8px 10px; cursor:pointer;
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:0.16em; text-transform:uppercase;
+    border-right:1px solid rgba(236,231,218,0.1);
+  }
+  .segs button:last-child{ border-right:0;}
+  .segs button.active{ background: var(--vermillion); color: var(--bone);}
+
+  /* ---------- ACCENT THEME OVERRIDES ---------- */
+  body[data-accent="vermillion"]{ --vermillion:#d8232a; --vermillion-2:#b51a20; }
+  body[data-accent="gold"]{ --vermillion:#d8a23a; --vermillion-2:#b58522; }
+  body[data-accent="magenta"]{ --vermillion:#e3357a; --vermillion-2:#bc1f5e;}
+  body[data-accent="cyan"]{ --vermillion:#3ad0e3; --vermillion-2:#1ea5b8;}
+
+  /* hide HUD optional */
+  body[data-hud="off"] .hud-corner,
+  body[data-hud="off"] .hud-tag,
+  body[data-hud="off"] .vertical-kana{ display:none;}
+
+  /* ---------- REVEAL ANIMATIONS ---------- */
+  .reveal{ opacity:0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease;}
+  .reveal.in{ opacity:1; transform:none;}
+  .stagger > * { opacity:0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+  .stagger.in > * { opacity:1; transform:none; }
+  .stagger.in > *:nth-child(2){ transition-delay:.1s;}
+  .stagger.in > *:nth-child(3){ transition-delay:.2s;}
+  .stagger.in > *:nth-child(4){ transition-delay:.3s;}
+
+  /* ---------- HAMBURGER + MOBILE MENU ---------- */
+  .burger{
+    display:none;
+    appearance:none; background:transparent; border:0; cursor:pointer;
+    width:44px; height:44px; padding:0;
+    align-items:center; justify-content:center;
+    position:relative;
+    z-index:101;
+  }
+  .burger span{
+    position:absolute; left:10px; right:10px; height:1.5px;
+    background:var(--paper);
+    transition: transform .3s ease, top .3s ease, opacity .2s ease;
+  }
+  .burger span:nth-child(1){ top:14px; }
+  .burger span:nth-child(2){ top:21px; }
+  .burger span:nth-child(3){ top:28px; }
+  .burger.open span:nth-child(1){ top:21px; transform: rotate(45deg);}
+  .burger.open span:nth-child(2){ opacity:0;}
+  .burger.open span:nth-child(3){ top:21px; transform: rotate(-45deg);}
+
+  .mobile-menu{
+    position:fixed; inset:0; z-index:99;
+    background: rgba(10,5,5,0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color:var(--paper);
+    display:flex; flex-direction:column;
+    padding: 90px 32px 32px;
+    opacity:0; pointer-events:none;
+    transform: translateY(-12px);
+    transition: opacity .3s ease, transform .3s ease;
+    overflow-y:auto;
+  }
+  .mobile-menu.open{ opacity:1; pointer-events:auto; transform:none;}
+  .mobile-menu::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      url('assets/hero-kunoichi.jpg');
+    background-size:cover; background-position:center;
+    opacity:0.18;
+    mix-blend-mode: luminosity;
+  }
+  .mobile-menu::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background: radial-gradient(ellipse at 80% 100%, rgba(216,35,42,0.18), transparent 60%),
+                linear-gradient(180deg, rgba(10,5,5,0.6), rgba(10,5,5,0.95));
+  }
+  .mobile-menu .inner{
+    position:relative; z-index:1;
+    display:flex; flex-direction:column; gap:32px;
+    flex:1;
+  }
+  .mobile-menu .crumb{
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.28em; text-transform:uppercase;
+    color: rgba(236,231,218,0.55);
+    display:flex; align-items:center; gap:12px;
+  }
+  .mobile-menu .crumb::before{ content:""; width:32px; height:1.5px; background:var(--vermillion);}
+  .mobile-menu nav.m-links{
+    display:flex; flex-direction:column; gap:0;
+    margin-top:8px;
+  }
+  .mobile-menu nav.m-links a{
+    display:flex; align-items:baseline; gap:18px;
+    padding: 18px 0;
+    border-bottom:1px solid rgba(236,231,218,0.1);
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:700;
+    font-size: 40px;
+    line-height:1;
+    color: var(--bone);
+    text-decoration:none;
+    letter-spacing:-0.01em;
+    transition: color .2s ease, padding-left .2s ease;
+  }
+  .mobile-menu nav.m-links a .n{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; letter-spacing:0.2em;
+    color: rgba(236,231,218,0.45);
+    flex:none; min-width:32px;
+  }
+  .mobile-menu nav.m-links a .ji{
+    font-family:'Shippori Mincho B1', serif;
+    font-size:18px; color:var(--vermillion);
+    margin-left:auto;
+    letter-spacing:0;
+    align-self:center;
+  }
+  .mobile-menu nav.m-links a:hover, .mobile-menu nav.m-links a.active{
+    color: var(--vermillion);
+    padding-left:8px;
+  }
+  .mobile-menu .m-util{
+    margin-top: auto;
+    display:flex; flex-direction:column; gap:14px;
+    padding-top: 24px;
+  }
+  .mobile-menu .m-util .pill{
+    align-self:flex-start;
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid rgba(255,255,255,0.16);
+    padding:6px 12px; border-radius:999px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.12em; color: rgba(236,231,218,0.85);
+  }
+  .mobile-menu .m-util .pill .dot{ width:7px;height:7px;border-radius:999px;background:#5cd16b; box-shadow:0 0 8px #5cd16b;}
+  .mobile-menu .m-util .row-btns{ display:flex; gap:10px; flex-wrap:wrap;}
+  .mobile-menu .m-util .row-btns .btn{ flex:1; min-width: 140px; justify-content:center;}
+  .mobile-menu .m-foot{
+    padding-top:18px; border-top:1px dashed rgba(236,231,218,0.15);
+    display:flex; justify-content:space-between; gap:12px;
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:0.18em; text-transform:uppercase;
+    color: rgba(236,231,218,0.45);
+  }
+  body.menu-open{ overflow:hidden;}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 1180px){
+    .nav{ padding:16px 24px;}
+    .nav .links{ gap:20px; font-size:12px;}
+    .nav .util .pill{ display:none;}
+    .hero .content{ left:48px; right:48px; bottom:64px; gap:28px;}
+    .hero .vertical-kana{ font-size:11px; right:24px;}
+    .features, .news{ padding: 96px 48px;}
+    .mega{ padding: 120px 48px;}
+    footer{ padding: 56px 48px;}
+  }
+
+  @media (max-width: 900px){
+    /* nav -> burger mode */
+    .nav{ grid-template-columns: 1fr auto; padding: 14px 20px; }
+    .nav .links{ display:none; }
+    .nav .util{ display:flex; }
+    .nav .util .signin{ display:none; }
+    .burger{ display:inline-flex; }
+
+    /* hero */
+    .hero{ min-height: 100svh; }
+    .hero .bg{ background-position: 60% center; }
+    .hero .scrim{
+      background:
+        linear-gradient(180deg, rgba(10,5,5,0.45) 0%, rgba(10,5,5,0.1) 22%, rgba(10,5,5,0.3) 55%, rgba(10,5,5,0.96) 100%),
+        linear-gradient(0deg, rgba(10,5,5,0.6), rgba(10,5,5,0.2));
+    }
+    .hero .content{
+      grid-template-columns: 1fr;
+      left:24px; right:24px; bottom:36px;
+      gap:20px;
+    }
+    .hero .stack{ max-width:none; gap:12px;}
+    h1.title{ font-size: clamp(44px, 12vw, 72px);}
+    .subtitle{ font-size:16px; max-width:none;}
+    .kicker{ font-size:11px; letter-spacing:0.2em; gap:10px;}
+    .kicker::before{ width:30px;}
+    .cta-row{
+      flex-direction:column; align-items:stretch; gap:10px; margin-top:14px;
+    }
+    .btn.primary{ justify-content:center; padding:16px 22px;}
+    .trailer-card{ min-width:0; width:100%;}
+    .platform-row{
+      flex-wrap:wrap; gap:8px 14px; font-size:10px; letter-spacing:0.18em;
+    }
+    .platform-row .stars{ font-size:11px;}
+    .scroll-cue{ display:none;}
+    .hanko.hero-hanko{ display:none;}
+    .hero .vertical-kana{ display:none;}
+    .hud-corner{ width:22px; height:22px;}
+    .hud-corner.tl{ top:80px; left:20px;}
+    .hud-corner.tr{ top:80px; right:20px;}
+    .hud-corner.bl{ bottom:20px; left:20px;}
+    .hud-corner.br{ bottom:20px; right:20px;}
+    .hud-tag.tl{ top:84px; left:50px; font-size:10px;}
+    .hud-tag.tr{ top:84px; right:50px; font-size:10px;}
+    .hud-tag .row:nth-child(2){ display:none;}
+
+    /* sections */
+    .features, .news{ padding: 80px 24px;}
+    .mega{ padding: 100px 24px;}
+    footer{ padding: 56px 24px;}
+    .section-head{ flex-direction:column; align-items:flex-start; gap:16px; margin-bottom:32px;}
+    .section-head .right{ flex-direction:row; align-items:center; gap:14px; text-align:left;}
+    .section-head .right .kana{ font-size:22px;}
+    .features .grid{ grid-template-columns: 1fr; gap:20px;}
+    .feat .body{ padding:24px 22px 24px;}
+    .feat h3{ font-size:28px;}
+    .feat .media .num{ font-size:56px; bottom:14px; left:14px;}
+    .feat .specs{ flex-wrap:wrap; gap:18px 24px; padding-top:18px;}
+
+    .news .grid{ grid-template-columns: 1fr; gap:20px;}
+    .post h4{ font-size:22px;}
+    .post .body{ padding: 20px;}
+    .news .read-all{ margin-top: 40px; gap:16px;}
+    .news .read-all a{ font-size:12px; letter-spacing:0.18em;}
+
+    .mega h2{ font-size: clamp(48px, 14vw, 84px);}
+    .mega .kana-row{ font-size:16px; letter-spacing:0.4em;}
+    .mega .row{ margin-top: 40px; flex-direction:column;}
+    .mega .row .btn{ width:100%; justify-content:center;}
+    .mega .meta{ font-size:10px; letter-spacing:0.2em;}
+    .mega .hanko{ display:none;}
+
+    .footer-grid{ grid-template-columns: 1fr 1fr; gap: 36px 24px;}
+    .footer-brand{ grid-column: 1 / -1;}
+    .footer-legal{ flex-direction:column; align-items:flex-start; gap:10px; font-size:10px;}
+
+    /* tweaks panel as drawer */
+    .tweaks-panel{
+      left: 16px; right: 16px; bottom: 16px; width:auto;
+    }
+  }
+
+  @media (max-width: 480px){
+    .nav{ padding: 12px 16px;}
+    .nav .brand{ font-size:18px; gap:10px;}
+    .nav .brand .seal{ width:30px; height:30px; font-size:16px;}
+    .hud-tag.tl, .hud-tag.tr{ display:none;}
+    .hero .content{ left:18px; right:18px; bottom:28px;}
+    h1.title{ font-size: clamp(38px, 14vw, 60px);}
+    .features, .news{ padding: 64px 18px;}
+    .mega{ padding: 80px 18px;}
+    footer{ padding: 48px 18px;}
+    .footer-grid{ grid-template-columns: 1fr;}
+
+    .mobile-menu{ padding: 80px 24px 24px;}
+    .mobile-menu nav.m-links a{ font-size: 32px; padding: 14px 0;}
+    .mobile-menu nav.m-links a .ji{ font-size:14px;}
+  }
+</style>
+</head>
+<body data-accent="vermillion" data-hud="on">
+
+  <!-- ============ NAV ============ -->
+  <nav class="nav" id="nav">
+    <div class="brand">
+      <div class="seal mincho">忍</div>
+      <span>KUNOICHI</span>
+    </div>
+    <div class="links">
+      <a href="#" class="active">Home</a>
+      <a href="#">World</a>
+      <a href="#">Characters</a>
+      <a href="#">Media</a>
+      <a href="#">News</a>
+      <a href="#">Store</a>
+    </div>
+    <div class="util">
+      <span class="pill"><span class="dot"></span>Servers Online · 42,189</span>
+      <a class="signin" href="#">Sign in</a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ============ MOBILE MENU ============ -->
+  <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Main menu">
+    <div class="inner">
+      <div class="crumb mono">// Menu · Sector 9</div>
+      <nav class="m-links">
+        <a href="#" class="active"><span class="n">01</span>Home<span class="ji mincho">家</span></a>
+        <a href="#"><span class="n">02</span>World<span class="ji mincho">世界</span></a>
+        <a href="#"><span class="n">03</span>Characters<span class="ji mincho">人物</span></a>
+        <a href="#"><span class="n">04</span>Media<span class="ji mincho">媒体</span></a>
+        <a href="#"><span class="n">05</span>News<span class="ji mincho">通信</span></a>
+        <a href="#"><span class="n">06</span>Store<span class="ji mincho">店</span></a>
+      </nav>
+      <div class="m-util">
+        <span class="pill"><span class="dot"></span>Servers Online · 42,189</span>
+        <div class="row-btns">
+          <a class="btn primary" href="#play"><span>Play Kunoichi</span><span class="arrow">▶</span></a>
+          <a class="btn ghost" href="#">Sign in</a>
+        </div>
+        <div class="m-foot">
+          <span>Build 2087.05.22</span>
+          <span>EN ▾</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <video class="bg" autoplay muted loop playsinline preload="auto" poster="assets/hero-poster.jpg">
+      <source src="assets/hero-loop.mp4" type="video/mp4" />
+    </video>
+    <div class="scrim"></div>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+
+    <span class="hud-corner tl"></span>
+    <span class="hud-corner tr"></span>
+    <span class="hud-corner bl"></span>
+    <span class="hud-corner br"></span>
+
+    <div class="hud-tag tl mono">
+      <div class="row">// FEED · SECTOR 9 · NEO-EDO</div>
+      <div class="row">LAT 35.689 · LON 139.692</div>
+    </div>
+    <div class="hud-tag tr mono">
+      <div class="row">BUILD 2087.05.22</div>
+      <div class="row red">● REC · 02:14</div>
+    </div>
+
+    <div class="vertical-kana">
+      <span>歩けば静か</span>
+      <span class="accent">　・　</span>
+      <span>斬れば速し</span>
+    </div>
+
+    <div class="hanko hero-hanko mincho">忍</div>
+
+    <div class="content">
+      <div class="stack">
+        <div class="kicker">Codename · Subject 00 · K. <span class="ji">くノ一</span></div>
+        <h1 class="title">
+          Walk soft.<br>
+          Strike <span class="dot-red">hard.</span>
+        </h1>
+        <p class="subtitle">
+          A neon-soaked stealth-action RPG set in the vertical city of Neo-Edo. The corp owns the lights, you own the dark.
+        </p>
+
+        <div class="cta-row">
+          <a class="btn primary" href="#play">
+            <span>Play Kunoichi</span>
+            <span class="arrow">▶</span>
+          </a>
+          <a class="trailer-card" href="#trailer">
+            <div class="thumb"></div>
+            <div class="meta">
+              <div class="l1">▷ Watch · Official</div>
+              <div class="l2">Cinematic Trailer</div>
+              <div class="l3">02:14 · 4K HDR</div>
+            </div>
+          </a>
+        </div>
+
+        <div class="platform-row">
+          <span>PC</span><span class="sep">·</span>
+          <span>PS5</span><span class="sep">·</span>
+          <span>Xbox Series</span><span class="sep">·</span>
+          <span>Steam</span>
+          <span class="sep">·</span>
+          <span class="stars">★★★★½</span>
+          <span>9.2 / 10 · IGN</span>
+        </div>
+      </div>
+
+      <div class="scroll-cue mono">
+        <span>Scroll · §02 Features</span>
+        <span class="line"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ FEATURES ============ -->
+  <section class="features">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow mono">§ 02 · The blade and the city</div>
+        <h2>Two things that<br>make it sing.</h2>
+      </div>
+      <div class="right">
+        <span class="mono">Filed under · GAMEPLAY</span>
+        <span class="kana mincho">特集</span>
+      </div>
+    </div>
+
+    <div class="grid stagger" id="features-grid">
+      <article class="feat">
+        <div class="media" style="background-image:url('assets/feature-01.jpeg');">
+          <span class="badge mono">Feature · 01</span>
+          <span class="num mincho"><span class="o">No.</span>01</span>
+        </div>
+        <div class="body">
+          <div class="kana-mark mincho">刀 · 八つの構え</div>
+          <h3>Silent Blade System</h3>
+          <p class="desc">Eight stances. Chain parries, kunai throws, and shadowstrikes into a single fluid rhythm. Read the enemy, change the meter, vanish before they hit the floor.</p>
+          <div class="tags">
+            <span>Parry</span><span>Stealth</span><span>Finishers</span><span>No QTEs</span>
+          </div>
+          <div class="specs">
+            <div><b>8</b>Stances</div>
+            <div><b>120+</b>Finishers</div>
+            <div><b>0</b>Quicktime</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="feat">
+        <div class="media" style="background-image:url('assets/feature-02.jpeg');">
+          <span class="badge mono">Feature · 02</span>
+          <span class="num mincho"><span class="o">No.</span>02</span>
+        </div>
+        <div class="body">
+          <div class="kana-mark mincho">街 · 生きる江戸</div>
+          <h3>Living Neo-Edo</h3>
+          <p class="desc">A vertical city of corp towers, rain-slick alleys, and rooftop shrines. Seven warring factions remember every debt you settle. Sometimes that's the problem.</p>
+          <div class="tags">
+            <span>Open World</span><span>Factions</span><span>Day / Night</span><span>Reputation</span>
+          </div>
+          <div class="specs">
+            <div><b>7</b>Factions</div>
+            <div><b>1:1</b>Day-Night</div>
+            <div><b>40h+</b>Main Story</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ NEWS ============ -->
+  <section class="news">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow mono">§ 03 · Field dispatch</div>
+        <h2>From the dispatch.</h2>
+      </div>
+      <div class="right">
+        <span class="mono">14 posts · last 30 days</span>
+        <span class="kana mincho">通信</span>
+      </div>
+    </div>
+
+    <div class="grid stagger" id="news-grid">
+      <a href="#" class="post">
+        <div class="media" style="background-image:url('assets/news-01.jpg');">
+          <span class="tag">Patch · 0.7</span>
+        </div>
+        <div class="body">
+          <div class="meta">May 22 · 4 min read</div>
+          <h4>"Rooftop Rain" patch 0.7 drops tonight</h4>
+          <p>New rooftop traversal, two boss fights, a rebuilt Photo Mode, and the first co-op dungeon. Full notes inside.</p>
+          <span class="more">Read post <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="#" class="post">
+        <div class="media" style="background-image:url('assets/news-02.jpg');">
+          <span class="tag dev">Dev Diary</span>
+        </div>
+        <div class="body">
+          <div class="meta">May 09 · 7 min read</div>
+          <h4>Designing the Eight Stances</h4>
+          <p>Combat lead Mei Tanaka breaks down how rhythm, risk, and silence shape every encounter in Kunoichi.</p>
+          <span class="more">Read post <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a href="#" class="post">
+        <div class="media" style="background-image:url('assets/news-03.jpg');">
+          <span class="tag event">Season 02</span>
+        </div>
+        <div class="body">
+          <div class="meta">Apr 28 · 3 min read</div>
+          <h4>Tournament of Petals begins</h4>
+          <p>Compete weekly for limited masks, dyes, and a shot at the season leaderboard. Top 100 earn the Falling Sakura set.</p>
+          <span class="more">Read post <span class="arrow">→</span></span>
+        </div>
+      </a>
+    </div>
+
+    <div class="read-all">
+      <span class="line"></span>
+      <a href="#">Read every dispatch <span class="arrow mono">→</span></a>
+      <span class="line"></span>
+    </div>
+  </section>
+
+  <!-- ============ MEGA CTA ============ -->
+  <section class="mega">
+    <div class="bg"></div>
+    <div class="scrim"></div>
+    <div class="scanlines"></div>
+    <div class="hanko mincho">忍</div>
+
+    <div class="wrap reveal">
+      <div class="eyebrow">// End · Transmission</div>
+      <h2>
+        The city<br>
+        is <span class="red">waiting.</span>
+      </h2>
+      <div class="kana-row mincho">都市は待っている</div>
+
+      <div class="row">
+        <a class="btn primary" href="#play">
+          <span>Play Kunoichi · Free</span>
+          <span class="arrow">▶</span>
+        </a>
+        <a class="btn ghost" href="#trailer">
+          <span>▷  Watch Trailer · 2:14</span>
+        </a>
+      </div>
+
+      <div class="meta">~ 4 GB · Instant Play · PC · PS5 · XSX · Steam · ESRB M</div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo-row">
+          <div class="seal mincho">忍</div>
+          <div class="logo">KUNOICHI</div>
+        </div>
+        <p>A neon-soaked stealth-action RPG by Studio Hanzo. Tokyo / Berlin. Released into the dark, 2087.</p>
+        <div class="social">
+          <a href="#" aria-label="Discord">D</a>
+          <a href="#" aria-label="X">X</a>
+          <a href="#" aria-label="Reddit">R</a>
+          <a href="#" aria-label="YouTube">Y</a>
+          <a href="#" aria-label="Instagram">IG</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h5>Game</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Characters</a></li>
+          <li><a href="#">World</a></li>
+          <li><a href="#">Roadmap</a></li>
+          <li><a href="#">System Reqs</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Media</h5>
+        <ul>
+          <li><a href="#">Trailers</a></li>
+          <li><a href="#">Screenshots</a></li>
+          <li><a href="#">Wallpapers</a></li>
+          <li><a href="#">Press kit</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">Reddit</a></li>
+          <li><a href="#">YouTube</a></li>
+          <li><a href="#">X / Twitter</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <ul>
+          <li><a href="#">Help center</a></li>
+          <li><a href="#">Server status</a></li>
+          <li><a href="#">Refunds</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-legal">
+      <span>© 2087 Studio Hanzo · Built in Tokyo &amp; Berlin</span>
+      <span class="rating">M · 17+ · Blood · Language · Violence</span>
+      <span class="build">Build 2087.05.22-r3</span>
+      <span>Privacy · Terms · Cookies</span>
+    </div>
+  </footer>
+
+  <!-- ============ TWEAKS PANEL ============ -->
+  <div class="tweaks-panel" id="tweaks">
+    <div class="tp-head">
+      <span>// Tweaks</span>
+      <button class="x" id="tp-close" aria-label="Close">✕</button>
+    </div>
+    <div class="tp-body">
+      <div class="tweak-group">
+        <label>Accent</label>
+        <div class="swatches" id="accent-swatches">
+          <button data-accent="vermillion" style="background:#d8232a" class="active" aria-label="Vermillion"></button>
+          <button data-accent="gold" style="background:#d8a23a" aria-label="Gold"></button>
+          <button data-accent="magenta" style="background:#e3357a" aria-label="Magenta"></button>
+          <button data-accent="cyan" style="background:#3ad0e3" aria-label="Cyan"></button>
+        </div>
+      </div>
+      <div class="tweak-group">
+        <label>HUD chrome</label>
+        <div class="segs" id="hud-segs">
+          <button data-hud="on" class="active">On</button>
+          <button data-hud="off">Off</button>
+        </div>
+      </div>
+      <div class="tweak-group">
+        <label>News background</label>
+        <div class="segs" id="news-bg-segs">
+          <button data-newsbg="paper" class="active">Paper</button>
+          <button data-newsbg="ink">Ink</button>
+        </div>
+      </div>
+      <div class="tweak-group">
+        <label>Hero motion</label>
+        <div class="segs" id="motion-segs">
+          <button data-motion="on" class="active">On</button>
+          <button data-motion="off">Off</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // -------- nav scroll state --------
+  const nav = document.getElementById('nav');
+  const onScroll = () => {
+    if (window.scrollY > 24) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  };
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // -------- mobile menu --------
+  const burger = document.getElementById('burger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  function setMenu(open){
+    burger.classList.toggle('open', open);
+    mobileMenu.classList.toggle('open', open);
+    document.body.classList.toggle('menu-open', open);
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  }
+  burger.addEventListener('click', () => setMenu(!mobileMenu.classList.contains('open')));
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && mobileMenu.classList.contains('open')) setMenu(false); });
+
+  // -------- reveal on scroll --------
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('in');
+    });
+  }, {threshold: 0.15});
+  document.querySelectorAll('.reveal, .stagger').forEach(el => io.observe(el));
+
+  // -------- Tweaks panel (host protocol) --------
+  const tweaks = document.getElementById('tweaks');
+  const body = document.body;
+  const newsSection = document.querySelector('.news');
+
+  function setAccent(v){
+    body.setAttribute('data-accent', v);
+    document.querySelectorAll('#accent-swatches button').forEach(b => b.classList.toggle('active', b.dataset.accent === v));
+  }
+  function setHud(v){
+    body.setAttribute('data-hud', v);
+    document.querySelectorAll('#hud-segs button').forEach(b => b.classList.toggle('active', b.dataset.hud === v));
+  }
+  function setNewsBg(v){
+    if (v === 'ink'){
+      newsSection.style.background = 'var(--ink-2)';
+      newsSection.style.color = 'var(--paper)';
+      newsSection.querySelectorAll('.section-head h2').forEach(el => el.style.color = 'var(--bone)');
+      newsSection.querySelectorAll('.section-head .eyebrow').forEach(el => el.style.color = 'rgba(236,231,218,0.55)');
+      newsSection.querySelectorAll('.section-head .right').forEach(el => el.style.color = 'rgba(236,231,218,0.6)');
+      newsSection.querySelectorAll('.section-head .right .kana').forEach(el => el.style.color = 'rgba(236,231,218,0.12)');
+      newsSection.querySelectorAll('.post').forEach(el => { el.style.background = 'var(--ink-3)'; el.style.borderColor = 'rgba(236,231,218,0.1)'; });
+      newsSection.querySelectorAll('.post h4').forEach(el => el.style.color = 'var(--bone)');
+      newsSection.querySelectorAll('.post p').forEach(el => el.style.color = 'rgba(236,231,218,0.7)');
+      newsSection.querySelectorAll('.post .meta').forEach(el => el.style.color = 'rgba(236,231,218,0.55)');
+      newsSection.querySelectorAll('.read-all a').forEach(el => el.style.color = 'var(--paper)');
+      newsSection.querySelectorAll('.read-all .line').forEach(el => el.style.background = 'repeating-linear-gradient(90deg, rgba(236,231,218,0.4) 0 6px, transparent 6px 12px)');
+    } else {
+      newsSection.removeAttribute('style');
+      newsSection.querySelectorAll('[style]').forEach(el => el.removeAttribute('style'));
+      // restore the original feature-card backgrounds set inline
+      document.querySelectorAll('.feat .media').forEach(el => {});
+      // re-apply post media inline images that we may have stripped
+      const imgs = [
+        'assets/news-01.jpg',
+        'assets/news-02.jpg',
+        'assets/news-03.jpg'
+      ];
+      newsSection.querySelectorAll('.post .media').forEach((el, i) => {
+        el.style.backgroundImage = `url('${imgs[i]}')`;
+      });
+    }
+    document.querySelectorAll('#news-bg-segs button').forEach(b => b.classList.toggle('active', b.dataset.newsbg === v));
+  }
+  function setMotion(v){
+    const bg = document.querySelector('.hero .bg');
+    if (v === 'off') { bg.pause && bg.pause(); }
+    else { bg.play && bg.play().catch(()=>{}); }
+    document.querySelectorAll('#motion-segs button').forEach(b => b.classList.toggle('active', b.dataset.motion === v));
+  }
+
+  document.querySelectorAll('#accent-swatches button').forEach(b => b.addEventListener('click', () => setAccent(b.dataset.accent)));
+  document.querySelectorAll('#hud-segs button').forEach(b => b.addEventListener('click', () => setHud(b.dataset.hud)));
+  document.querySelectorAll('#news-bg-segs button').forEach(b => b.addEventListener('click', () => setNewsBg(b.dataset.newsbg)));
+  document.querySelectorAll('#motion-segs button').forEach(b => b.addEventListener('click', () => setMotion(b.dataset.motion)));
+
+  document.getElementById('tp-close').addEventListener('click', () => {
+    tweaks.classList.remove('open');
+    window.parent.postMessage({type:'__edit_mode_dismissed'}, '*');
+  });
+
+  // host protocol
+  window.addEventListener('message', (ev) => {
+    const d = ev.data || {};
+    if (d.type === '__activate_edit_mode') tweaks.classList.add('open');
+    if (d.type === '__deactivate_edit_mode') tweaks.classList.remove('open');
+  });
+  window.parent.postMessage({type:'__edit_mode_available'}, '*');
+</script>
+
+</body>
+</html>
